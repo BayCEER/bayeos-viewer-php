@@ -1,0 +1,96 @@
+### Commented entries have reasonable defaults.
+### Uncomment to edit them.
+# Source: <source package name; defaults to package name>
+Section: misc
+Priority: optional
+# Homepage: <enter URL here; no default>
+Standards-Version: 3.9.2
+
+Package: bayeos-viewer-php
+Version: 0.1.7
+Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
+# Pre-Depends: <comma-separated list of packages>
+Depends: libjs-jquery, libjs-jquery-ui, php5, libapache2-mod-php5, php5-xmlrpc, apache2
+# Recommends: <comma-separated list of packages>
+# Suggests: <comma-separated list of packages>
+# Provides: <comma-separated list of packages>
+# Replaces: <comma-separated list of packages>
+# Architecture: all
+# Copyright: <copyright file; defaults to GPL2>
+# Changelog: <changelog file; defaults to a generic changelog>
+# Readme: <README.Debian file; defaults to a generic one>
+Extra-Files: 
+# Files: <pair of space-separated paths; First is file to include, second is destination>
+#  <more pairs, if there's more than one file to include. Notice the starting space>
+Description: Web application for BayEOS-Server
+Files: bayeos-viewer-php /etc/apache2/conf.d/
+ bayeos-viewer.ini /etc/
+ www/actions.php /usr/share/bayeos-viewer-php/
+ www/constants.php /usr/share/bayeos-viewer-php/
+ www/csv.php /usr/share/bayeos-viewer-php/
+ www/csv_df.php /usr/share/bayeos-viewer-php/
+ www/search.php /usr/share/bayeos-viewer-php/
+ www/fonts/glyphicons-halflings-regular.eot /usr/share/bayeos-viewer-php/
+ www/fonts/glyphicons-halflings-regular.woff /usr/share/bayeos-viewer-php/
+ www/fonts/glyphicons-halflings-regular.ttf /usr/share/bayeos-viewer-php/
+ www/fonts/glyphicons-halflings-regular.svg /usr/share/bayeos-viewer-php/
+ www/js/jstz.min.js /usr/share/bayeos-viewer-php/
+ www/js/rickshaw.min.js /usr/share/bayeos-viewer-php/
+ www/js/d3.min.js /usr/share/bayeos-viewer-php/
+ www/js/rickshaw.min.css /usr/share/bayeos-viewer-php/
+ www/js/bootstrap.min.js /usr/share/bayeos-viewer-php/
+ www/js/spinnerOrangeBig.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerGreen.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerDefault.png /usr/share/bayeos-viewer-php/
+ www/js/jquery.datetimeentry.pack.js /usr/share/bayeos-viewer-php/
+ www/js/spinnerGem.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerText.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerDefaultBig.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerSquareBig.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerTextBig.png /usr/share/bayeos-viewer-php/
+ www/js/jquery.timeentry.css /usr/share/bayeos-viewer-php/
+ www/js/bootstrap.js /usr/share/bayeos-viewer-php/
+ www/js/spinnerBlue.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerUpDownBig.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerBlueBig.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerOrange.png /usr/share/bayeos-viewer-php/
+ www/js/jquery.datetimeentry.css /usr/share/bayeos-viewer-php/
+ www/js/bundle-bundle_bootstrap_defer.js /usr/share/bayeos-viewer-php/
+ www/js/bootstrap-switch.js /usr/share/bayeos-viewer-php/
+ www/js/jquery.timeentry.pack.js /usr/share/bayeos-viewer-php/
+ www/js/spinnerGemBig.png /usr/share/bayeos-viewer-php/
+ www/js/jquery-1.js /usr/share/bayeos-viewer-php/
+ www/js/spinnerSquare.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerUpDown.png /usr/share/bayeos-viewer-php/
+ www/js/spinnerGreenBig.png /usr/share/bayeos-viewer-php/
+ www/views.php /usr/share/bayeos-viewer-php/
+ www/view_breadcrumbs.php /usr/share/bayeos-viewer-php/
+ www/view_chart.php /usr/share/bayeos-viewer-php/
+ www/view_childs.php /usr/share/bayeos-viewer-php/
+ www/view_clipboard.php /usr/share/bayeos-viewer-php/
+ www/view_footer.php /usr/share/bayeos-viewer-php/
+ www/view_header.php /usr/share/bayeos-viewer-php/
+ www/view_ipauth.php /usr/share/bayeos-viewer-php/
+ www/view_login.php /usr/share/bayeos-viewer-php/
+ www/view_object.php /usr/share/bayeos-viewer-php/
+ www/view_roles.php /usr/share/bayeos-viewer-php/
+ www/view_special_data_frame.php /usr/share/bayeos-viewer-php/
+ www/functions.php /usr/share/bayeos-viewer-php/
+ www/index.php /usr/share/bayeos-viewer-php/
+ www/css/bootstrap.icon-large.min.css /usr/share/bayeos-viewer-php/
+ www/css/bootstrap.min.css /usr/share/bayeos-viewer-php/
+ www/css/bootstrap-theme.css.map /usr/share/bayeos-viewer-php/
+ www/css/bootstrap-theme.css /usr/share/bayeos-viewer-php/
+ www/css/bundle-fixtaglib_head.css /usr/share/bayeos-viewer-php/
+ www/css/bootstrap-switch.css /usr/share/bayeos-viewer-php/
+ www/css/bundle-bundle_bootstrap_head.css /usr/share/bayeos-viewer-php/
+ www/css/main.css /usr/share/bayeos-viewer-php/
+ www/css/bootstrap.css.map /usr/share/bayeos-viewer-php/
+ www/css/bootstrap.css /usr/share/bayeos-viewer-php/
+ www/css/signin.css /usr/share/bayeos-viewer-php/
+ www/css/bootstrap-theme.min.css /usr/share/bayeos-viewer-php/
+ www/img/glyphicons.png /usr/share/bayeos-viewer-php/
+ www/chart.php /usr/share/bayeos-viewer-php/
+ xmlrpc.inc /usr/share/php/
+ xmlrpcs.inc /usr/share/php/
+ xmlrpc_wrappers.inc /usr/share/php/

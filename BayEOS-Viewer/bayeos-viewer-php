@@ -1,0 +1,6 @@
+Alias /bayeosViewer /usr/share/bayeos-viewer-php/www
+<Directory /usr/share/bayeos-viewer-php/www/>
+  Order allow,deny
+  Allow from all
+</Directory>
+
