@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once 'xmlrpc.inc';
 $xmlrpc_internalencoding = 'UTF-8';
 require_once './constants.php';
@@ -18,9 +20,9 @@ function get_object_fields($uname){
 				array('name'=>'Plan Start','nr'=>15,'cols'=>6,'type'=>'dateTime.iso8601','unr'=>3),
 				array('name'=>'Plan End','nr'=>16,'cols'=>6,'type'=>'dateTime.iso8601','unr'=>4),
 				array('name'=>'Description','nr'=>21,'cols'=>12,'type'=>'text','unr'=>1,'xmltype'=>'string'),
-				array('name'=>'Resolution','nr'=>22,'cols'=>4,'type'=>'int','unr'=>2),
-				array('name'=>'Interval Type','nr'=>23,'cols'=>4,'type'=>'IntervalTypes','unr'=>5,'xmltype'=>'int'),
-				array('name'=>'Time Zone','nr'=>24,'cols'=>4,'type'=>'TimeZones','unr'=>6,'xmltype'=>'int')
+				array('name'=>'Resolution','nr'=>22,'cols'=>4,'type'=>'int','unr'=>2,'default'=>600),
+				array('name'=>'Interval Type','nr'=>23,'cols'=>4,'type'=>'IntervalTypes','unr'=>5,'xmltype'=>'int','default'=>0),
+				array('name'=>'Time Zone','nr'=>24,'cols'=>4,'type'=>'TimeZones','unr'=>6,'xmltype'=>'int','default'=>1)
 			);
 		break;
 		case 'mess_geraet':
@@ -63,14 +65,15 @@ function get_object_fields($uname){
 				array('name'=>'Plan End','nr'=>16,'cols'=>6,'type'=>'dateTime.iso8601','unr'=>1),
 				array('name'=>'Rec Start','nr'=>17,'cols'=>6,'type'=>'dateTime.iso8601','unr'=>2),
 				array('name'=>'Rec End','nr'=>18,'cols'=>6,'type'=>'dateTime.iso8601','unr'=>3),
-				array('name'=>'Name','nr'=>20,'cols'=>0,'type'=>'hidden','unr'=>4,'xmltype'=>'string'),
+				array('name'=>'Name','nr'=>13,'cols'=>0,'type'=>'hidden','unr'=>4,'xmltype'=>'string'),
 				array('name'=>'Description','nr'=>21,'cols'=>12,'type'=>'text','unr'=>5,'xmltype'=>'string'),
-				array('name'=>'Time Zone','nr'=>22,'cols'=>4,'type'=>'TimeZones','unr'=>6,'xmltype'=>'int')
+				array('name'=>'Time Zone','nr'=>22,'cols'=>4,'type'=>'TimeZones','unr'=>6,'xmltype'=>'int','default'=>1)
 			);
+			$_POST['o13']=$_POST['t5']; //Hack! Set Name=Node-Name!!
 		break;
 	}
 	if($uname=='data_column'){
-		$ofields[6]=array('name'=>'Column Index','nr'=>22,'cols'=>6,'type'=>'int','unr'=>6);
+		$ofields[6]=array('name'=>'Column Index','nr'=>22,'cols'=>6,'type'=>'int','unr'=>6,'default'=>1);
 		$ofields[7]=array('name'=>'Data Type','nr'=>23,'cols'=>6,'type'=>'DataTypes','unr'=>7,'xmltype'=>'string');
 	}
 	return $ofields;
@@ -94,6 +97,38 @@ function getUserGroups($tag){
 	reset($_SESSION['Benutzer']);
 	reset($_SESSION['Gruppen']);
 	return($res);
+}
+
+//Extract common path from clipboard series
+function get_folder_subfolders(){
+	$folders=array();
+	$res=array();
+	for($i=0;$i<count($_SESSION['clipboard']);$i++){
+		$folders[$i]=explode('/',$_SESSION['clipboard'][$i]['path'][1]);
+	}
+	$max=count($folders[0])-1;
+	for($i=1;$i<count($folders);$i++){
+		$j=0;
+		while($j<=$max && isset($folders[$i][$j]) && isset($folders[0][$j]) && 
+				$folders[$i][$j]==$folders[0][$j])
+			$j++;
+		$j--;
+		if($j<$max) $max=$j;
+	}
+	
+	$res['folder']=implode('/',array_slice($folders[0],0,$max+1));
+	$has_subpath=FALSE;
+	$subfolders=array();
+	for($i=0;$i<count($folders);$i++){
+		if(count($folders[$i])>($max+1)){
+			$subfolders[$i]=implode('/',array_slice($folders[$i],$max+1));
+			$has_subpath=TRUE;
+		} else
+			$subfolders[$i]='';
+	}
+	if($has_subpath) $res['subfolders']=$subfolders;
+	return $res;
+	
 }
 
 function get_root_id($uname){
@@ -135,10 +170,16 @@ function xml_call($method,$args){
 	)));
 	$file = file_get_contents($_SESSION['bayeosurl'],
 			false, $context);
+	if($file===false){
+		$error=error_get_last();
+		$GLOBALS['alert'].='<div class="alert alert-danger">XMLRPC-Error: No response from BayEOS-Server using URL '.$_SESSION['bayeosurl'].'<br/>
+		<b>This is the error message:</b> '.$error['message'].'</div>';
+		return false;
+	}
 	//echo htmlspecialchars($file);
 	$response = xmlrpc_decode($file,'UTF-8');
 	if ($response && is_array($response) && xmlrpc_is_fault($response)) {
-		$GLOBALS['alert']='<div class="alert alert-danger">'."xmlrpc $method: $response[faultString] ($response[faultCode])".'</div>';
+		$GLOBALS['alert'].='<div class="alert alert-danger">'."xmlrpc $method: $response[faultString] ($response[faultCode])".'</div>';
 		return false;
 	} else {
 		return $response;

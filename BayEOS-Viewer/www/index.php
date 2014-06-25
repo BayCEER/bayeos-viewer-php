@@ -11,9 +11,6 @@
  *  |-views.php 
  *********************************************************/
 
-session_start();
-$config=parse_ini_file('/etc/bayeos-viewer.ini');
-$_SESSION['bayeosurl']=$config['serverURL'];
 
 require_once './functions.php';
 require_once './actions.php';

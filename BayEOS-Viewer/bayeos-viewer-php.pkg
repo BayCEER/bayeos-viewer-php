@@ -7,7 +7,7 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 0.1.7
+Version: 0.1.8
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
 # Pre-Depends: <comma-separated list of packages>
 Depends: libjs-jquery, libjs-jquery-ui, php5, libapache2-mod-php5, php5-xmlrpc, apache2

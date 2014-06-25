@@ -2,7 +2,6 @@
 /**********************************************************
  * Called for CSV Exports
  *********************************************************/
-session_start();
 require './functions.php';
 
 if(! isset($_SESSION['bayeosauth'])){

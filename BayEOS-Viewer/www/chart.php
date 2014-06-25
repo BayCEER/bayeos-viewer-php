@@ -5,7 +5,7 @@
  * currently not used in the application
  *********************************************************/
 require './functions.php';
-session_start();
+
 if(! isset($_SESSION['bayeosauth'])){
   header("HTTP/1.0 403 Access Denied");
   header("Status: 403 Access Denied");

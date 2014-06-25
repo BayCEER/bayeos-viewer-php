@@ -35,7 +35,9 @@ if(! $found){
 
 $i=0;
 echo '<ol class="breadcrumb">';
+$_SESSION['currentpath']='';
 while($i<count($_SESSION['breadcrumbs'])){
+	$_SESSION['currentpath'].='/'.$_SESSION['breadcrumbs'][$i][5];
 	if($_SESSION['breadcrumbs'][$i][2]==$_SESSION['id'])
 		echo '<li class="active">'.$_SESSION['breadcrumbs'][$i][5].'</li>';
 	else

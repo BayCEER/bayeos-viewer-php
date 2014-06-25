@@ -14,7 +14,10 @@ $bayeos_canhavechilds=array('messung_ordner'=>array('messung_ordner','data_frame
 		'mess_einheit'=>array('mess_einheit'),'mess_ziel'=>array('mess_ziel'),
 		'mess_ort'=>array('mess_ort'),'mess_geraet'=>array('mess_geraet'),
 		'mess_kompartiment'=>array('mess_kompartiment'));
-$bayeos_has_special_view=array('data_frame'=>'Editor');
+$bayeos_has_special_view=array(
+		'data_frame'=>array(array('df_editor','zoom-in','Editor'),
+			array('df_export','download-alt','Export'))
+		);
 $uname_name_hash=array('art_objekt'=>'Class',
 		'mess_ziel'=>'Target',
 		'messung'=>'Series',

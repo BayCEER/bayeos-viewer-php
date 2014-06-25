@@ -1,8 +1,10 @@
 <?php
+
 if(is_numeric($_GET['edit']))
 	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['edit'],'int')));
+else 
+	$node=array(0=>1,4=>$_GET['edit']);
 
-else $node=array(0=>1,4=>$_GET['edit']);
 $options=array('old_hidden'=>1);
 if(! $node[0]) $options['readonly']=1;
 
@@ -12,12 +14,25 @@ echo '<form action="?edit='.$_GET['edit'].'&view='.$_GET['view'].'" method="POST
 '.($node[5]?'Node &quot;'.$node[5].'&quot; - ID: '.$node[2]:'New Node').'
 </div>
 <div class="row">
-
-
 ';
+if(is_numeric($_GET['edit'])){
+echo '<ul class="nav nav-tabs">
+';
+$tabs=array(array('','edit','Details'),
+		array('ref','tags','References'),
+		array('acl','user','ACL'));
+if(isset($GLOBALS['bayeos_has_special_view'][$node[4]]))
+	$tabs=array_merge($tabs,$GLOBALS['bayeos_has_special_view'][$node[4]]);
+for($i=0;$i<count($tabs);$i++){
+	echo '<li'.($_GET['view']==$tabs[$i][0]?' class="active"':'').'><a href="?edit='.$node[2].'&view='.$tabs[$i][0].'">
+	<span class="glyphicon glyphicon-'.$tabs[$i][1].'"></span> '.$tabs[$i][2].'</a></li>';
+}
+echo '</ul>';
+}
+
 if($_GET['view']=='ref'){
 	if($node[0]){
-		echo '<input type="hidden" name="_action_ref_save" value="1">
+		echo '<br/><input type="hidden" name="_action_ref_save" value="1">
 		'.get_input('refclass','RefClasses','mess_einheit','').'
 		'.get_input("newref",'autocomplete','','',array('refclass'=> "$('#refclass').val()")).'
 		<input type="submit" value="add" name="addref">';
@@ -121,11 +136,9 @@ if($_GET['view']=='ref'){
 </table>
 </div></div>
 <?php
-} elseif($_GET['view']=='special'){
-	require 'view_special_'.$node[4].'.php';
-} else {
+} elseif($_GET['view']=='') {
 	echo_field("t5",'Name','string',$node[5],4,$options);
-	if($node[0]){
+	if($node[0] && is_numeric($_GET['edit'])){
 		echo_field("parentid","Move to",'autocomplete','',4,
 				array('refclass'=> "'".$GLOBALS['bayeos_tree_unames'][$_SESSION['current_tree']]."'",
 						'additional_args'=>'mustMatch: true,'));
@@ -145,31 +158,36 @@ if($_GET['view']=='ref'){
 						new xmlrpcval($node[4],'string')));
 		for($i=0;$i<count($ofields);$i++){
 			$value=($ofields[$i]['type']=='dateTime.iso8601'?toDate($objekt[$ofields[$i]['nr']]):$objekt[$ofields[$i]['nr']]);
+			if(! $value && isset($ofields[$i]['default'])) $value=$ofields[$i]['default'];
 			echo_field("o".$ofields[$i]['nr'],$ofields[$i]['name'],$ofields[$i]['type'],
 					$value,$ofields[$i]['cols'],$options);
 
 		}
 		echo '</div></div>';
 	}
+} else {
+	require 'view_'.$_GET['view'].'.php';
 }
-
 echo '
 <div class="block-action">';
 if(is_numeric($_GET['edit'])){
 	if($node[0]) 
 		echo_button('Update','ok','',"btn btn-primary",'type="submit"');
-	echo_button('Details','edit','?edit='.$node[2]);
-	if(isset($GLOBALS['bayeos_hasref'][$node[4]]))
-		echo_button('References','tags','?view=ref&edit='.$node[2]);
-	echo_button('ACL','user','?view=acl&edit='.$node[2]);
-	if($node[4]=='messung_massendaten') 
-		echo_button('To Clipboard','pushpin','?add='.$node[2]);
-	if(isset($GLOBALS['bayeos_has_special_view'][$node[4]])) 
-		echo_button($GLOBALS['bayeos_has_special_view'][$node[4]],'zoom-in','?view=special&edit='.$node[2]);
 	if($node[0])
 		echo ' <button class="btn btn-default" name="_action_remove" onclick="return confirm(\'Are you sure?\');">
 	<span class="glyphicon glyphicon-trash"></span> Delete
 </button>';
+	switch ($node[4]){
+		case 'messung_massendaten':
+		case 'messung_ordner':
+			echo_button('To Clipboard','pushpin','?add='.$node[2]);
+			break;
+		case 'data_column':
+			echo_button('Data Frame','edit','?view=df_editor&edit='.$node[3]);
+			break;
+	}
+	
+	
 } else 
 	echo_button('Save','ok','',"btn btn-primary",'type="submit"');
 

@@ -45,6 +45,10 @@ if($_SESSION['tab']=='Chart' && ! count($_SESSION['clipboard'])){
  ***********************************************************/
 
 if(isset($_POST['login']) && isset($_POST['password'])){
+	$config=parse_ini_file('/etc/bayeos-viewer.ini');
+	if(isset($config['serverURL'])) $_SESSION['bayeosurl']=$config['serverURL'];
+	else $_SESSION['bayeosurl']='http://'.$_SERVER['SERVER_ADDR'].'/BayEOS-Server/XMLServlet';
+	
 	$res = xml_call("LoginHandler.createSession",
 			array(new xmlrpcval($_POST['login'],'string'),
 					new xmlrpcval($_POST['password'],'string')));
@@ -268,7 +272,7 @@ if(isset($_POST["t5"]) && $_POST["t5"] && isset($_GET['edit']) && ! is_numeric($
 //Save Object:
 if(is_numeric($_GET['edit']) && isset($_POST["t5"])){
 	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['edit'],'int')));
-	$changed=0;
+	$changed=($_POST["t5"]!=$_POST["_old_t5"]);
 	$ofields=get_object_fields($node[4]);
 	for($i=0;$i<count($ofields);$i++){
 		if($_POST['o'.$ofields[$i]['nr']]!=$_POST['_old_o'.$ofields[$i]['nr']]){
@@ -396,6 +400,8 @@ if(isset($_GET['add']) && is_numeric($_GET['add'])){
 			$object=xml_call('ObjektHandler.getObjekt',array(new xmlrpcval($node[2],'int'),
 				new xmlrpcval('messung_massendaten','string')));
 			$node['res']=$object[22];
+			$node['path']=array((isset($_GET['folder_id'])?$_GET['folder_id']:$_SESSION['id']),
+					$_SESSION['currentpath'].$_GET['subpath']);
 			$_SESSION['clipboard'][]=$node;
 			add_alert($node[5].' (ID '.$node[2].') added to your
 					<a href="?tab=Clipboard" class="alert-link">clipboard</a>');
@@ -418,9 +424,12 @@ if(isset($_GET['add']) && is_numeric($_GET['add'])){
 					));
 		if(count($childs)==0)
 			add_alert('No timeseries found in folder','warning');
-				
-		for($i=0;$i<count($childs);$i++){
-			addToClipboard($childs[$i][0]);
+		else {
+			$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['add'],'int')));
+			$_GET['subpath'].='/'.$node[5];
+			for($i=0;$i<count($childs);$i++){
+				addToClipboard($childs[$i][0]);
+			}
 		}
 	}
 	$_SESSION['chartdata']=0;

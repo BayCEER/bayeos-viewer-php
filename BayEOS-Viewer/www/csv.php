@@ -2,7 +2,6 @@
 /**********************************************************
  * Called for CSV Exports
  *********************************************************/
-session_start();
 require './functions.php';
 
 if(! isset($_SESSION['bayeosauth'])){
@@ -29,10 +28,18 @@ switch($_SESSION['csv_sep']){
 		break;
 }
 
+//Extract path and subpath
+$pathinfo=get_folder_subfolders();
+
 $filename='bayeos-export.csv';
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-$out='# Timezone: '.$_SESSION['csv_tz'].'
+$out='# Exported: '.date('y-m-d H:i').'
+# Server: '.$_SESSION['bayeosurl'].'
+# Timezone: '.$_SESSION['csv_tz'].'
 # Dateformat: '.$_SESSION['csv_dateformat'].'
+# Folder: '.$pathinfo['folder'].
+(isset($pathinfo['subfolders'])? '
+# Subfolders: '.$_SESSION['csv_sep'].implode($_SESSION['csv_sep'], $pathinfo['subfolders']):'').'
 # Units: ';
 $ids=array();
 date_default_timezone_set($_SESSION['csv_tz']);

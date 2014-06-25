@@ -2,6 +2,23 @@
 /************************************************************
  * Views 
  ***********************************************************/
+function get_path($path,$max=30){
+	$tmp=explode("/",$path);
+	$out='';
+	for($i=count($tmp)-1;$i>=0;$i--){
+		if($tmp[$i]){
+			if(mb_strlen($out)>$max){
+				$out='.../'.$out;
+				return $out;
+			}
+			$out=$tmp[$i].'/'.$out;
+		}
+	}
+	if($tmp[0]!='.')
+		$out='/'.$out;
+	return $out;
+}
+
 function echo_button($name,$icon,$url='',$class='btn btn-default',$button_attr=''){
 	echo "\n";
 	if($url) echo '<a href="'.$url.'" class="'.$class.'" >';
@@ -244,7 +261,7 @@ function echo_table($childs,$action="add"){
 					'<a href="?id='.$childs[$i][2].(strstr($childs[$i][4],'messung_')?'&tab=Folders':'').'">'.$childs[$i][5].'</a>':$childs[$i][5]).'
 					</td>
 					'.($with_path?'<td class="hidden-xs">
-			<a href="?id='.$childs[$i]['path'][0].'">'.$childs[$i]['path'][1].'</a>
+			<a href="?tab=Folders&id='.$childs[$i]['path'][0].'">'.get_path($childs[$i]['path'][1],40).'</a>
 							</td>':'').'
 			<td class="hidden-xs">'.toDate($childs[$i][6]).'</td>
 			<td class="hidden-xs">'.toDate($childs[$i][7]).'</td>
@@ -253,7 +270,8 @@ function echo_table($childs,$action="add"){
 			if($childs[$i][4]=='messung_massendaten' || $childs[$i][4]=='messung_ordner'){
 			switch($action){
 				case 'add':
-					echo '<a href="./?add='.$childs[$i][2].'" class="btn btn-xs btn-default">
+					echo '<a href="./?add='.$childs[$i][2].
+					($with_path?'&subpath='.urlencode(substr($childs[$i]['path'][1],1)).'&folder_id='.$childs[$i]['path'][0]:'').'" class="btn btn-xs btn-default">
 	         		<span class="glyphicon glyphicon-pushpin"></span> To Clipboard</a>';
 					break;
 				case 'remove':

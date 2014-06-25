@@ -37,7 +37,13 @@ function checkres($interval,$res){
 	}
 }
 
+$pathinfo=get_folder_subfolders();
+
 for($i=0;$i<$max_i;$i++){
+	if(isset($pathinfo['subfolders']))
+		$_SESSION['clipboard'][$i]['subfolder']=$pathinfo['subfolders'][$i];
+	else 
+		$_SESSION['clipboard'][$i]['subfolder']='';
 	if($_SESSION['chartmulti'])
 		$series[$i]=array($_SESSION['clipboard'][$i]);
 	else 
@@ -133,7 +139,7 @@ for($i=0;$i<count($series[$p]);$i++){
 	}
 	echo "],
 	color: palette.color(),
-    name: '".$series[$p][$i][5].($unit[$i]?" [$unit[$i]]":'')."'}";
+    name: '".$series[$p][$i]['subfolder'].' <b>'.$series[$p][$i][5].'</b>'.($unit[$i]?" [$unit[$i]]":'')."'}";
 }
 
 
