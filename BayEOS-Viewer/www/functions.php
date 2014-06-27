@@ -7,8 +7,8 @@ require_once './constants.php';
 
 $GLOBALS['alert']='';
 function add_alert($text,$type='success',$dismissable=TRUE){
-	$GLOBALS['alert'].='<div class="alert alert-'.$type.'"'.($dismissable?' alert-dismissable">
-	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>':'>').
+	$GLOBALS['alert'].='<div class="alert alert-'.$type.($dismissable?' alert-dismissable">
+	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>':'">').
 	$text.'</div>';
 }
 
@@ -202,7 +202,7 @@ function toDateFromString($isodate){
 }
 
 function toDate($isodate){
-	return( ($isodate->timestamp?date('Y-m-d H:i',$isodate->timestamp-3600):'') );
+	return( (is_object($isodate) && $isodate->timestamp?date('Y-m-d H:i',$isodate->timestamp-3600):'') );
 }
 
 function toiso8601($date){
@@ -211,5 +211,47 @@ function toiso8601($date){
 	return(gmdate('Ymd\TH:i:s',mktime($tmp['hour'],$tmp['minute'],$tmp['second'],$tmp['month'],$tmp['day'],$tmp['year'])+3600));
 }
 
+function getName($id){
+	if(! isset($GLOBALS['treehash'][$id])){
+		$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($id,'int')));
+		$GLOBALS['treehash'][$id]=array($node[3],$node[5]);
+	} 
+	return $GLOBALS['treehash'][$id];
+}
+
+function getPath($id_parent){
+	if($_SESSION['id']==$id_parent) return $_SESSION['currentpath'];
+	$path='';
+	while($id_parent){
+		list($id_parent,$name)=getName($id_parent);
+		$path='/'.$name.$path;
+		if($id_parent==$_SESSION['id']) return $_SESSION['currentpath'].$path;
+	}
+	return $path;
+}
+
+function addToClipboard($node,$alert=1){
+	for($i=0;$i<count($_SESSION['clipboard']);$i++){
+		if($_SESSION['clipboard'][$i][2]==$node){
+			add_alert($_SESSION['clipboard'][$i][5]. "(ID $node) is already on your
+					<a href=\"?tab=Clipboard\" class=\"alert-link\">clipboard</a>",'warning');
+					return 1;
+		}
+	}
+
+	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($node,'int')));
+	if($node[4]=='messung_massendaten'){
+	$object=xml_call('ObjektHandler.getObjekt',array(new xmlrpcval($node[2],'int'),
+			new xmlrpcval('messung_massendaten','string')));
+			$node['res']=$object[22];
+			$node['path']=array($node[3],getPath($node[3]));
+			$_SESSION['clipboard'][]=$node;
+			if($alert) 
+				add_alert($node[5].' (ID '.$node[2].') added to your
+					<a href="?tab=Clipboard" class="alert-link">clipboard</a>');
+			return 1;
+	}
+	return 0;
+}
 
 ?>

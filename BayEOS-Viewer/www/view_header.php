@@ -60,7 +60,8 @@
 												'Compartments'=>array('icon'=>'th-large'),
 												'sep'=>1,
 												'User/Groups'=>array('icon'=>'user'),
-												'IP Authentication'=>array('icon'=>'cloud')
+												'IP Authentication'=>array('icon'=>'cloud'),
+												'Settings'=>array('icon'=>'wrench')
 										)));
 						while(list($key,$value)=each($nav)){
 							if(isset($value['dropdown'])){
@@ -102,7 +103,7 @@
 							<?php echo $_SESSION['login'];?>
 						</span>
 							</p>
-						<a href="?aktion=logout">
+						<a href="?action=logout">
 							<button type="button" class="btn btn-default navbar-btn">Logout</button>
 						</a>
 						<?php }?>

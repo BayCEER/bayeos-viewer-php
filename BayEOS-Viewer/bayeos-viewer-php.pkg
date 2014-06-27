@@ -7,7 +7,7 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 0.1.8
+Version: 0.1.10
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
 # Pre-Depends: <comma-separated list of packages>
 Depends: libjs-jquery, libjs-jquery-ui, php5, libapache2-mod-php5, php5-xmlrpc, apache2
@@ -26,6 +26,7 @@ Description: Web application for BayEOS-Server
 Files: bayeos-viewer-php /etc/apache2/conf.d/
  bayeos-viewer.ini /etc/
  www/actions.php /usr/share/bayeos-viewer-php/
+ www/action_login.php /usr/share/bayeos-viewer-php/
  www/constants.php /usr/share/bayeos-viewer-php/
  www/csv.php /usr/share/bayeos-viewer-php/
  www/csv_df.php /usr/share/bayeos-viewer-php/
@@ -74,7 +75,9 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/view_login.php /usr/share/bayeos-viewer-php/
  www/view_object.php /usr/share/bayeos-viewer-php/
  www/view_roles.php /usr/share/bayeos-viewer-php/
- www/view_special_data_frame.php /usr/share/bayeos-viewer-php/
+ www/view_settings.php /usr/share/bayeos-viewer-php/
+ www/view_df_editor.php /usr/share/bayeos-viewer-php/
+ www/view_df_export.php /usr/share/bayeos-viewer-php/
  www/functions.php /usr/share/bayeos-viewer-php/
  www/index.php /usr/share/bayeos-viewer-php/
  www/css/bootstrap.icon-large.min.css /usr/share/bayeos-viewer-php/

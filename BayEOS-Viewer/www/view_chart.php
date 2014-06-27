@@ -1,8 +1,11 @@
 <?php 
 //Limit Plotting to five series
-if(count($_SESSION['clipboard'])>5){
-	$max_i=5;
-	echo '<div class="alert alert-warning">You have more than five series on your clipboard. Only first five will get plotted.</div>';
+if(count($_SESSION['clipboard'])>$_SESSION['max_cols']){
+	$max_i=$_SESSION['max_cols'];
+	echo '<div class="alert alert-warning">You have more than '.$_SESSION['max_cols'].
+	' series on your clipboard. Only first '.$_SESSION['max_cols'].' will get plotted.
+	Change <a href="?tab=Settings" class="alert-link">settings</a> or remove series from your 
+	<a href="?tab=Clipboard" class="alert-link">clipboard</a>.</div>';
 } else 
 	$max_i=count($_SESSION['clipboard']);
 
@@ -18,21 +21,22 @@ for($i=0;$i<count($_SESSION['AgrIntervalle']);$i++){
 function checkres($interval,$res){
 	$i=0;
 	if(! $res) $res=600;
-	$max=5000;
+	$max=$_SESSION['max_rows'];
 	if($_SESSION['agrint']){
 		$res=$GLOBALS['resByID'][$_SESSION['agrint']];
 		$i=$GLOBALS['indexByID'][$_SESSION['agrint']];
-		$max=1000;
+		$max=$_SESSION['max_rows']/5;
 	}
 	while(($interval/$res)>$max && $i<(count($_SESSION['AgrIntervalle'])-1)){
 		$i++;
-		$max=1000;
+		$max=$_SESSION['max_rows']/5;
 		$res=$_SESSION['AgrIntervalle'][$i][2];
 	}
 	if($i>$_SESSION['agrint']){
 		$_SESSION['agrint']=$_SESSION['AgrIntervalle'][$GLOBALS['indexByID'][$i]][0];
 		$_SESSION['agrfunc']=1;
-		echo '<div class="alert alert-warning">Your time interval is to large for plotting.
+		echo '<div class="alert alert-warning">Estimated rows exceeds '.$_SESSION['max_rows'].' set as maximum
+		in <a href="?tab=Settings" class="alert-link">settings</a>.
 		Switched to '.$_SESSION['AgrIntervalle'][$GLOBALS['indexByID'][$i]][1].' + Avg</div>';
 	}
 }
@@ -41,7 +45,7 @@ $pathinfo=get_folder_subfolders();
 
 for($i=0;$i<$max_i;$i++){
 	if(isset($pathinfo['subfolders']))
-		$_SESSION['clipboard'][$i]['subfolder']=$pathinfo['subfolders'][$i];
+		$_SESSION['clipboard'][$i]['subfolder']=$pathinfo['subfolders'][$i].'/';
 	else 
 		$_SESSION['clipboard'][$i]['subfolder']='';
 	if($_SESSION['chartmulti'])
@@ -55,6 +59,25 @@ for($i=0;$i<$max_i;$i++){
 
 <script src="js/d3.min.js"></script>
 <script src="js/rickshaw.min.js"></script>
+<script>
+function addLeadingZeros(number, length) {
+    var num = '' + number;
+    while (num.length < length) num = '0' + num;
+    return num;
+}
+function format_date(d){
+	var s=d.getFullYear()+'-'+addLeadingZeros(d.getMonth()+1,2)+'-'+addLeadingZeros(d.getDate(),2)+' '+d.toLocaleTimeString();
+	return s;
+}
+
+function set_from_until(g,from,until){
+	if(from!=null)
+		$('#from').val(format_date(new Date(from*1000)));
+	if(until!=null)
+		$('#until').val(format_date(new Date(until*1000)));
+	
+}
+</script>	
 <script>
 var palette = new Rickshaw.Color.Palette( { scheme: 'colorwheel' } );
 
@@ -152,6 +175,7 @@ var preview<?php echo $p;?> = new Rickshaw.Graph.RangeSlider( {
 	graph: graph<?php echo $p;?>,
 	element: document.getElementById('preview<?php echo $p;?>'),
 } );
+preview<?php echo $p;?>.slideCallbacks=[set_from_until];
 
 var hoverDetail<?php echo $p;?> = new Rickshaw.Graph.HoverDetail( {
 	graph: graph<?php echo $p;?>,
@@ -212,7 +236,8 @@ if($no_data) echo '<div class="alert alert-danger">At least on series returns no
 
 //Actionblock for zoom, move + data
 echo '
-<div class="block-action">';
+<div class="block-action dropdown">';
+echo_saved_cb_dropdown();
 echo_button('back','arrow-left',"?move=-1");
 echo_button('forward','arrow-right',"?move=+1");
 echo_button('Zoom in','zoom-in',"?zoom=+1");
@@ -286,6 +311,30 @@ if($_SESSION['chartdata']){
 </div>').'
 	</form>';
 		
+} else {
+	//Status tool
+	echo '
+	
+	<form action="?action=chartstatus" method="POST" class="form" role="form">';
+	echo '<div class="block">
+		<div class="block-header">Set Status for selected rows</div>
+		<div class="row">
+		';
+		echo_field("from",'From (inclusive &ge;)','dateTime.iso8601','',3);
+		echo_field("until",'Until (inclusive &le;)','dateTime.iso8601','',3);
+		echo_field("status",'Status','Status',"-1",3);
+		echo '	<div class="col-sm-6 col-lg-3">
+		<br/>
+		<button class="btn btn-primary" type="submit" id="set_status">
+		<span class="glyphicon glyphicon-ok"></span> Set Status</button>
+		</div>
+		
+		</div>
+		</div>
+		</form>
+		<br/>
+		';
+	
 }
 
 

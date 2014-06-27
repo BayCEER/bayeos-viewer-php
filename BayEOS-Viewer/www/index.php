@@ -8,7 +8,11 @@
  *  |  |- xmlrpc.inc
  *  |  |- constants.php
  *  |-actions.php
- *  |-views.php 
+ *     |- action_login.php
+ *     |- ...
+ *  |-views.php
+ *     |- view_header.php
+ *     |- ... 
  *********************************************************/
 
 
@@ -39,6 +43,10 @@ switch ($_SESSION['tab']){
 	case 'User/Groups':
 		require 'view_roles.php';
 		break;
+	case 'Settings':
+		require 'view_settings.php';
+		break;
+		
 	default:
 		require 'view_breadcrumbs.php';
 		if(isset($_GET['edit']))

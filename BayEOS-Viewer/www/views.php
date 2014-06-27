@@ -153,6 +153,21 @@ function echo_field($id,$name,$art,$value='',$col=6,$options=array()){
 }
 
 
+function echo_saved_cb_dropdown(){
+	if(count($_SESSION['cb_saved'])){?>
+	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ><span class="glyphicon glyphicon-upload"></span> Load <span class="caret"></span></button>
+		 <ul class="dropdown-menu" role="menu">
+	<?php 
+	while(list($key)=each($_SESSION['cb_saved'])){
+		echo '<li><a href="?cb_load='.urlencode($key).'">'.htmlspecialchars($key).'</a></li>';
+	}
+	reset($_SESSION['cb_saved']);
+	
+	?>
+	</ul>
+	<?php }
+		
+}
 
 
 function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
@@ -270,8 +285,7 @@ function echo_table($childs,$action="add"){
 			if($childs[$i][4]=='messung_massendaten' || $childs[$i][4]=='messung_ordner'){
 			switch($action){
 				case 'add':
-					echo '<a href="./?add='.$childs[$i][2].
-					($with_path?'&subpath='.urlencode(substr($childs[$i]['path'][1],1)).'&folder_id='.$childs[$i]['path'][0]:'').'" class="btn btn-xs btn-default">
+					echo '<a href="./?add='.$childs[$i][2].'" class="btn btn-xs btn-default">
 	         		<span class="glyphicon glyphicon-pushpin"></span> To Clipboard</a>';
 					break;
 				case 'remove':

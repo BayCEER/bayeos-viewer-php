@@ -45,60 +45,14 @@ if($_SESSION['tab']=='Chart' && ! count($_SESSION['clipboard'])){
  ***********************************************************/
 
 if(isset($_POST['login']) && isset($_POST['password'])){
-	$config=parse_ini_file('/etc/bayeos-viewer.ini');
-	if(isset($config['serverURL'])) $_SESSION['bayeosurl']=$config['serverURL'];
-	else $_SESSION['bayeosurl']='http://'.$_SERVER['SERVER_ADDR'].'/BayEOS-Server/XMLServlet';
-	
-	$res = xml_call("LoginHandler.createSession",
-			array(new xmlrpcval($_POST['login'],'string'),
-					new xmlrpcval($_POST['password'],'string')));
-	if($res===false) {
-
-	} else {
-		$_SESSION['bayeosauth']=base64_encode($res[0].':'.$res[1]);    	
-		$_SESSION['from']=date('Ymd',time()-24*3600).'T00:00:00';
-		$_SESSION['until']=date('Ymd',time()+24*3600).'T00:00:00';
-		$_SESSION['login']=$_POST['login'];
-		$_SESSION['breadcrumbs']=array();
-		$_SESSION['clipboard']=array();
-		$_SESSION['rootids']=array();
-		$_SESSION['id']=get_root_id('messung_ordner');
-		$_SESSION['breadcrumbs'][]=xml_call('TreeHandler.getNode',array(new xmlrpcval($_SESSION['id'],'int')));
-		$_SESSION['tab']='Folders';
-		$_SESSION['current_tree']='Folders';
-		$_SESSION['IntervalTypes']=xml_call('LookUpTableHandler.getIntervalTypes',array());
-		$_SESSION['TimeZones']=xml_call('LookUpTableHandler.getTimeZones',array());
-		$_SESSION['AgrFunktionen']=xml_call('LookUpTableHandler.getAgrFunktionen',array());
-		$_SESSION['AgrIntervalle']=xml_call('LookUpTableHandler.getAgrIntervalle',array());
-		$_SESSION['CRS']=xml_call('LookUpTableHandler.getCRS',array());
-		$_SESSION['Status']=xml_call('LookUpTableHandler.getStatus',array());
-		$_SESSION['DataTypes']=array('DOUBLE','INTEGER','DATE','BOOLEAN','STRING');
-		$_SESSION['agrint']='';
-		$_SESSION['agrfunc']='';
-		$_SESSION['StatusFilter']=array(0,1,2);
-		if($_SESSION['tz']=='Europe/Berlin'){
-			$_SESSION['csv_sep']=';';
-			$_SESSION['csv_dec']=',';
-			$_SESSION['csv_dateformat']='d.m.Y H:i:s';				
-		} else {
-			$_SESSION['csv_sep']=',';
-			$_SESSION['csv_dec']='.';
-			$_SESSION['csv_dateformat']='Y-m-d H:i:s';	
-		}
-		$_SESSION['RefClasses']=array(array('mess_ziel','Target'),
-				array('mess_einheit','Unit'),
-				array('mess_geraet','Device'),
-				array('mess_kompartiment','Compartment'),
-				array('mess_ort','Location')//,array('web','Web')
-				);
-	}
+	require 'action_login.php';
 }
 
 /***********************************************************
  * Logout Action
  ***********************************************************/
  
-if($_GET['aktion']=='logout'){
+if(isset($_GET['action']) && $_GET['action']=='logout'){
 	$res = xml_call("LogOffHandler.terminateSession",array());
 	if($res===true){
 		unset($_SESSION['bayeosauth']);
@@ -126,7 +80,7 @@ if(isset($_POST['_action_acl_save']) && is_numeric($_POST['newaclid'])){
 	$_GET['view']='acl';
 }
 //Delete ACL
-if(is_numeric($_GET['acldel'])){
+if(isset($_GET['acldel']) && is_numeric($_GET['acldel'])){
 	if(xml_call('RightHandler.deleteRight',
 			array(new xmlrpcval($_GET['edit'],'int'),
 					new xmlrpcval($_GET['acldel'],'int')
@@ -182,7 +136,7 @@ if(isset($_POST['_action_ref_save']) && ! $_POST['newref'] && $_POST['newref_dp'
 	}
 }
 //Create new reference:
-if(is_numeric($_POST['newref'])){
+if(isset($_POST['newref']) && is_numeric($_POST['newref'])){
 	if(xml_call('ObjektHandler.createReference',array(
 		new xmlrpcval($_POST['newref'],'int'),
 		new xmlrpcval($_GET['edit'],'int'),		
@@ -270,7 +224,7 @@ if(isset($_POST["t5"]) && $_POST["t5"] && isset($_GET['edit']) && ! is_numeric($
 ***********************************************************/
 
 //Save Object:
-if(is_numeric($_GET['edit']) && isset($_POST["t5"])){
+if(isset($_GET['edit']) && is_numeric($_GET['edit']) && isset($_POST["t5"])){
 	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['edit'],'int')));
 	$changed=($_POST["t5"]!=$_POST["_old_t5"]);
 	$ofields=get_object_fields($node[4]);
@@ -331,6 +285,31 @@ if(isset($_GET['action']) && $_GET['action']=='chartdata'){
 	}
 }
 
+if(isset($_GET['action']) && $_GET['action']=='chartstatus' 
+		&& $_POST['from'] && $_POST['until'] && $_POST['status']>-1){
+	$status=array();
+	while(list($k,$v)=each($_SESSION['Status'])){
+		$status[$v[0]]=$v[1];
+	}
+	reset($_SESSION['Status']);
+	//Note: We set the from 1 second back to have the border 'inclusive'
+	$from = new xmlrpcval(toios8601FromEpoch(toEpoch(toiso8601($_POST['from']))-1),'dateTime.iso8601');
+	$until= new xmlrpcval(toiso8601($_POST['until']),'dateTime.iso8601');
+	for($i=0;$i<count($_SESSION['clipboard']);$i++){
+		$res=xml_call('ToolsHandler.updateRows',
+			array(new xmlrpcval($_SESSION['clipboard'][$i][2],'int'),
+				  new xmlrpcval('messung_massendaten','string'),
+					$from,
+					$until,
+				  new xmlrpcval($_POST['status'],'int')));
+		if($res)
+			add_alert('Status of series <b>'.$_SESSION['clipboard'][$i][5].'</b> set to <b>'.$status[$_POST['status']].'</b>
+					for interval '.$_POST['from'].' to '.$_POST['until']);
+		
+	}
+	
+}
+
 /***********************************************************
  * DataFrame
  ***********************************************************/
@@ -379,37 +358,47 @@ if(isset($_POST['_action_df'])){
 		add_alert('Data frame updated');
 
 }
+/***********************************************************
+ * Settings
+***********************************************************/
+if(isset($_GET['cb_del']) && isset($_SESSION['cb_saved'][$_GET['cb_del']])){
+	unset($_SESSION['cb_saved'][$_GET['cb_del']]);
+	setcookie('cb_saved',serialize($_SESSION['cb_saved']));
+	add_alert('Deleted saved clipboard');
+}
+
+if(isset($_POST['action']) && $_POST['action']=='settings'){
+	setcookie('max_cols',$_POST['max_cols'],time()+3600*24*180);
+	setcookie('max_rows',$_POST['max_rows'],time()+3600*24*180);
+	$_SESSION['max_cols']=$_POST['max_cols'];
+	$_SESSION['max_rows']=$_POST['max_rows'];
+	add_alert('Settings saved');
+	
+}
+if(isset($_POST['action']) && $_POST['action']=='settings_clipboard' && $_POST['save_as']){
+	$ids=array();
+	for($i=0;$i<count($_SESSION['clipboard']);$i++){
+		$ids[]=$_SESSION['clipboard'][$i][2];
+	}
+	$_SESSION['cb_saved'][$_POST['save_as']]=$ids;
+	setcookie('cb_saved',serialize($_SESSION['cb_saved']));
+}
 
 /***********************************************************
  * Clipboard
  ***********************************************************/
+//Clipboard load
+if(isset($_GET['cb_load'])){
+	if(is_array($_SESSION['cb_saved'][$_GET['cb_load']])){
+		$_SESSION['clipboard']=array();
+		for($i=0;$i<count($_SESSION['cb_saved'][$_GET['cb_load']]);$i++){
+			addToClipboard($_SESSION['cb_saved'][$_GET['cb_load']][$i],0);
+		}
+	}
+}
 
 //Clipboard add
 if(isset($_GET['add']) && is_numeric($_GET['add'])){
-	function addToClipboard($node){
-		for($i=0;$i<count($_SESSION['clipboard']);$i++){
-			if($_SESSION['clipboard'][$i][2]==$node){
-				add_alert($_SESSION['clipboard'][$i][5]. "(ID $node) is already on your 
-						<a href=\"?tab=Clipboard\" class=\"alert-link\">clipboard</a>",'warning');
-				return 1;
-			}
-		}
-		
-		$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($node,'int')));
-		if($node[4]=='messung_massendaten'){		
-			$object=xml_call('ObjektHandler.getObjekt',array(new xmlrpcval($node[2],'int'),
-				new xmlrpcval('messung_massendaten','string')));
-			$node['res']=$object[22];
-			$node['path']=array((isset($_GET['folder_id'])?$_GET['folder_id']:$_SESSION['id']),
-					$_SESSION['currentpath'].$_GET['subpath']);
-			$_SESSION['clipboard'][]=$node;
-			add_alert($node[5].' (ID '.$node[2].') added to your
-					<a href="?tab=Clipboard" class="alert-link">clipboard</a>');
-			return 1;
-		}
-		return 0;
-	}	
-
 	if(! addToClipboard($_GET['add'])){ //Folder
 		$childs=xml_call('TreeHandler.getAllChildren',
 					array(new xmlrpcval($_GET['add'],'int'),

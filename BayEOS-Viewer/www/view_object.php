@@ -1,4 +1,5 @@
 <?php
+if(! isset($_GET['view'])) $_GET['view']='';
 
 if(is_numeric($_GET['edit']))
 	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['edit'],'int')));
@@ -29,7 +30,6 @@ for($i=0;$i<count($tabs);$i++){
 }
 echo '</ul>';
 }
-
 if($_GET['view']=='ref'){
 	if($node[0]){
 		echo '<br/><input type="hidden" name="_action_ref_save" value="1">
