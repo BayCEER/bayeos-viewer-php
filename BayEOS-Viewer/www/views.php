@@ -48,12 +48,12 @@ function get_input($id,$art,$value='',$class='form-control',$options=array()){
 	else $readonly='';
 	if(isset($options['selectvalues'])) $_SESSION['SelectValue']=$options['selectvalues'];
 	if(isset($options['selectids'])) $_SESSION['SelectID']=$options['selectids'];
-	
 	switch($art){
 		case 'hidden':
 			$out.= '<input type="hidden" name="'.$id.'" id="'.$id.'" value="'.htmlspecialchars($value).'"'.$readonly.'>';
 			break;
 		case 'autocomplete':
+			if(! isset($options['additional_args'])) $options['additional_args']='';
 			$out.='
 			<input class="'.$class.'" id="'.$id.'_dp" name="'.$id.'_dp">
 			<input id="'.$id.'" name="'.$id.'" type="hidden">

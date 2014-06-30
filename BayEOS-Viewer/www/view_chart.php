@@ -9,6 +9,11 @@ if(count($_SESSION['clipboard'])>$_SESSION['max_cols']){
 } else 
 	$max_i=count($_SESSION['clipboard']);
 
+if($max_i==0){
+	add_alert("Your clipboard is empty",'warning');
+	echo $GLOBALS['alert'];
+} else {
+
 //Auto adjust resolution for large intervals
 $series=array();
 $sec=toEpoch($_SESSION['until'])-toEpoch($_SESSION['from']);
@@ -60,6 +65,8 @@ for($i=0;$i<$max_i;$i++){
 <script src="js/d3.min.js"></script>
 <script src="js/rickshaw.min.js"></script>
 <script>
+var currentX=0;
+
 function addLeadingZeros(number, length) {
     var num = '' + number;
     while (num.length < length) num = '0' + num;
@@ -93,7 +100,12 @@ for($p=0;$p<count($series);$p++){
 		<div id="preview<?php echo $p;?>"></div>
 		</div>	
 <script>
-
+<?php if($_SESSION['chartdata']){?>
+$('#chart<?php echo $p;?>').on('click', function() { $("#cb"+currentX).prop('checked',true);});
+<?php } else { ?>
+$('#chart<?php echo $p;?>').on('click', function() { set_from_until('',currentX,currentX);});
+<?php } ?>
+	
 var graph<?php echo $p;?> = new Rickshaw.Graph({
 	element: document.querySelector("#chart<?php echo $p;?>"),
 	renderer: 'line',
@@ -180,6 +192,7 @@ preview<?php echo $p;?>.slideCallbacks=[set_from_until];
 var hoverDetail<?php echo $p;?> = new Rickshaw.Graph.HoverDetail( {
 	graph: graph<?php echo $p;?>,
 	xFormatter: function(x) {
+		currentX=x;
 		return new Date(x * 1000).toString();
 	}
 } );
@@ -233,11 +246,12 @@ yAxis<?php echo $p;?>.render();
 }
 if($no_data) echo '<div class="alert alert-danger">At least on series returns no data. Plotting will not work.</div>';
 
-
+} // clipboard empty!
 //Actionblock for zoom, move + data
 echo '
 <div class="block-action dropdown">';
 echo_saved_cb_dropdown();
+if($max_i){
 echo_button('back','arrow-left',"?move=-1");
 echo_button('forward','arrow-right',"?move=+1");
 echo_button('Zoom in','zoom-in',"?zoom=+1");
@@ -249,10 +263,12 @@ if(count($_SESSION['clipboard'])>1){
 if(! $_SESSION['agrfunc'] || ! $_SESSION['agrint']){
 	if($_SESSION['chartdata']) echo_button('Hide Data','arrow-up',"?chartdata=0");
 	else echo_button('Show Data','arrow-down',"?chartdata=1");
-}	
+}
+}
 echo '
 	</div>';
 
+if($max_i){
 //Datablock
 $readonly=!$_SESSION['clipboard'][0][0];
 if($_SESSION['chartdata']){
@@ -282,7 +298,7 @@ if($_SESSION['chartdata']){
 	for($i=0;$i<count($x);$i++){
 		echo '<tr><td>'
 		.date('Y-m-d H:i:s',$x[$i]).'</td><td>'.$y[$i].'</td><td>'.$status[$s[$i]].'</td>'.
-		($readonly?'':'<td><input type="checkbox" value="'.$x[$i].'" name="ts[]"></td>').'
+		($readonly?'':'<td><input type="checkbox" id="cb'.$x[$i].'" value="'.$x[$i].'" name="ts[]"></td>').'
 		</tr>';
 	}
 	echo '</tbody></table>
@@ -339,4 +355,5 @@ if($_SESSION['chartdata']){
 
 
 echo_filter_form();
+}
 ?>

@@ -132,7 +132,7 @@ function get_folder_subfolders(){
 }
 
 function get_root_id($uname){
-	if(! $_SESSION['rootids'][$uname]){
+	if(! isset($_SESSION['rootids'][$uname])){
 		$res=xml_call("TreeHandler.getRoot",
 				array(new xmlrpcval($uname,'string'),
 						new xmlrpcval(FALSE,'boolean'),
@@ -206,7 +206,7 @@ function toDate($isodate){
 }
 
 function toiso8601($date){
-	if(! date) return NULL;
+	if(! $date) return NULL;
 	$tmp=date_parse($date);
 	return(gmdate('Ymd\TH:i:s',mktime($tmp['hour'],$tmp['minute'],$tmp['second'],$tmp['month'],$tmp['day'],$tmp['year'])+3600));
 }

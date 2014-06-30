@@ -1,6 +1,6 @@
 <?php 
-if(is_numeric($_GET['edit'])) $_GET['id']=$_GET['edit'];
-if(is_numeric($_GET['id']))	$_SESSION['id']=$_GET['id'];
+if(isset($_GET['edit']) && is_numeric($_GET['edit'])) $_GET['id']=$_GET['edit'];
+if(isset($_GET['id']) && is_numeric($_GET['id']))	$_SESSION['id']=$_GET['id'];
 $i=0;
 $found=0;
 $count=count($_SESSION['breadcrumbs']);

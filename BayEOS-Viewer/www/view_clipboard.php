@@ -1,6 +1,11 @@
 <?php 
-if(! count($_SESSION['clipboard'])) echo '<div class="alert alert-warning">Your clipboard is empty.</div>';
-else 
+$clipboard=count($_SESSION['clipboard']);
+if(! $clipboard){
+	echo '<div class="alert alert-warning">Your clipboard is empty.</div>
+	';
+	echo_saved_cb_dropdown(); 
+}
+else {
 	echo_table($_SESSION['clipboard'],"remove");
 ?>
 <form method="POST" class="form" role="form">
@@ -24,6 +29,6 @@ If you did not enable cookies settings will only be valid until logout.
 </form>
 <br/>
 <?php 
-
 echo_filter_form("Export");
+}
 ?>

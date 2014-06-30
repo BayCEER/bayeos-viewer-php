@@ -1,8 +1,9 @@
+<?php if(! isset($_GET['search'])) $_GET['search']='';?>
 <form accept-charset="UTF-8">
 	<input name="search"
 		value="<?php echo htmlentities($_GET['search']);?>"> <label><input
 		type="checkbox" name="subtreesearch"
-		<?php if($_GET['subtreesearch']) echo "checked"?>> include subfolders</label>
+		<?php if(isset($_GET['subtreesearch']) && $_GET['subtreesearch']) echo "checked"?>> include subfolders</label>
 	<button type="submit" class="btn btn-primary">
 		<span class="glyphicon glyphicon-search"></span> Search
 	</button>

@@ -13,7 +13,7 @@
 if(isset($_POST['tz']) && $_POST['tz'])
 	$_SESSION['tz']=$_POST['tz'];
 	
-if($_SESSION['tz'])
+if(isset($_SESSION['tz']))
 	date_default_timezone_set($_SESSION['tz']);
 
 /***********************************************************
@@ -34,10 +34,6 @@ if(isset($_GET['tab'])){
 		$_GET['id']=$_SESSION['breadcrumbs'][$last_node][3];
 
 	$_SESSION['tab']=$_GET['tab'];
-}
-if($_SESSION['tab']=='Chart' && ! count($_SESSION['clipboard'])){
-	add_alert("Please add series to your clipboard",'warning');
-	$_SESSION['tab']='Folders';
 }
 
 /***********************************************************
@@ -74,7 +70,6 @@ if(isset($_POST['_action_acl_save']) && is_numeric($_POST['newaclid'])){
 		new xmlrpcval($_POST['newacl'][3],'boolean'),
 		new xmlrpcval($_POST['newacl'][4],'boolean')
 		))){
-		$_POST['newref']=$node[2];
 		add_alert('New ACL created');
 	}
 	$_GET['view']='acl';
@@ -90,7 +85,7 @@ if(isset($_GET['acldel']) && is_numeric($_GET['acldel'])){
 	$_GET['view']='acl';
 }
 //Update ACL
-if(isset($_POST['_action_acl_save'])){
+if(isset($_POST['_action_acl_save']) && isset($_POST['aclids'])){
 	$res=0;
 	$rights=array(1=>'read',2=>'write',3=>'exec',4=>'inherit');
 	for($i=0;$i<count($_POST['aclids']);$i++){
@@ -492,7 +487,7 @@ if(isset($_GET['move'])){
 if(isset($_GET['treefilter'])) $_SESSION['treefilter']=$_GET['treefilter'];
 if(isset($_GET['chartmulti'])) $_SESSION['chartmulti']=$_GET['chartmulti'];
 if(isset($_GET['chartdata'])) $_SESSION['chartdata']=$_GET['chartdata'];
-if($_SESSION['chartdata'] && count($_SESSION['clipboard'])>1){
+if(isset($_SESSION['chartdata']) && $_SESSION['chartdata'] && count($_SESSION['clipboard'])>1){
 	add_alert('Time series editing only works with <b>ONE</b> selected series!','warning');
 	$_SESSION['chartdata']=0;
 }
