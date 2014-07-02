@@ -7,7 +7,7 @@ $xml_mapper=array('STRING'=>'string','DOUBLE'=>'double','INTEGER'=>'int','BOOLEA
 $options=array('old_hidden'=>1);
 if(! $node[0]) $options['readonly']=1;
 ?>
-<input type="hidden" name="_action_df" value="1">
+<input type="hidden" name="action" value="df">
 <table class="table table-hover col-sm-12">
 	<thead>
 		<tr>

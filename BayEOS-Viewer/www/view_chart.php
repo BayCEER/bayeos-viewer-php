@@ -66,6 +66,31 @@ for($i=0;$i<$max_i;$i++){
 <script src="js/rickshaw.min.js"></script>
 <script>
 var currentX=0;
+var selectedX= new Object();
+
+function setSelectedTSTable(){
+    var keys = [];
+	for (var k in selectedX) {
+		keys.push(k);
+	}
+	keys.sort();
+
+	if(keys.length==0){
+		$('#selected_ts').html('');
+		$('#delete_bt').prop("disabled","disabled");
+		return;
+	}
+	$('#selected_ts').html('<div class="col-xs-12"><b>Selected Timestamps:</b></div>');
+	for (var i in keys) {
+		d=new Date(keys[i]*1000);
+		$('#selected_ts').append('<div class="col-md-4 col-xs-6">'+d.toString()+
+				' <input type="hidden" name="ts[]" value="'+keys[i]+'">'+
+				'<a class="btn btn-xs btn-default" onclick="delete selectedX['+keys[i]+']; setSelectedTSTable(); return;">'+
+				'<span class="glyphicon glyphicon-remove"></span></a></div>');
+	}
+    $('#selected_ts').append('<div class="col-xs-12"><hr/></div>');
+    $('#delete_bt').prop("disabled",null);
+}
 
 function addLeadingZeros(number, length) {
     var num = '' + number;
@@ -84,6 +109,9 @@ function set_from_until(g,from,until){
 		$('#until').val(format_date(new Date(until*1000)));
 	
 }
+
+
+
 </script>	
 <script>
 var palette = new Rickshaw.Color.Palette( { scheme: 'colorwheel' } );
@@ -103,7 +131,9 @@ for($p=0;$p<count($series);$p++){
 <?php if($_SESSION['chartdata']){?>
 $('#chart<?php echo $p;?>').on('click', function() { $("#cb"+currentX).prop('checked',true);});
 <?php } else { ?>
-$('#chart<?php echo $p;?>').on('click', function() { set_from_until('',currentX,currentX);});
+$('#chart<?php echo $p;?>').on('click', function() { selectedX[currentX]=1; setSelectedTSTable();
+//set_from_until('',currentX,currentX);
+});
 <?php } ?>
 	
 var graph<?php echo $p;?> = new Rickshaw.Graph({
@@ -327,13 +357,15 @@ if($_SESSION['chartdata']){
 </div>').'
 	</form>';
 		
-} else {
+} elseif(! $readonly) {
 	//Status tool
 	echo '
 	
-	<form action="?action=chartstatus" method="POST" class="form" role="form">';
+	<form action="?action=chartdata" method="POST" class="form" role="form">';
 	echo '<div class="block">
-		<div class="block-header">Set Status for selected rows</div>
+		<div class="block-header">Set Status or Delete data points</div>
+		<div class="row" id="selected_ts">
+		</div>
 		<div class="row">
 		';
 		echo_field("from",'From (inclusive &ge;)','dateTime.iso8601','',3);
@@ -343,6 +375,9 @@ if($_SESSION['chartdata']){
 		<br/>
 		<button class="btn btn-primary" type="submit" id="set_status">
 		<span class="glyphicon glyphicon-ok"></span> Set Status</button>
+	 <button id="delete_bt" class="btn btn-primary" type="submit" name="_action_remove" disabled="disabled"
+	  onclick="return confirm(\'Do you really want to delete data points for the selected timestamps?\');">
+	<span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</div>
 		
 		</div>

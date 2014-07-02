@@ -61,7 +61,8 @@
 												'sep'=>1,
 												'User/Groups'=>array('icon'=>'user'),
 												'IP Authentication'=>array('icon'=>'cloud'),
-												'Settings'=>array('icon'=>'wrench')
+												'Settings'=>array('icon'=>'wrench'),
+												'Change Password'=>array('icon'=>'refresh')
 										)));
 						while(list($key,$value)=each($nav)){
 							if(isset($value['dropdown'])){
@@ -77,7 +78,7 @@
 									else 
 										echo '
 									<li'.($key2==$_SESSION['tab']?' class="active"':'').'>
-									<a href="./?tab='.$key2.'"><span class="glyphicon glyphicon-'.$value2['icon'].'"></span> '.$key2.'</a>
+									<a href="./?tab='.urlencode($key2).'"><span class="glyphicon glyphicon-'.$value2['icon'].'"></span> '.$key2.'</a>
 									</li>';
 
 								}

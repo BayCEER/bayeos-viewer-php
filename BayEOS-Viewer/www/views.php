@@ -109,7 +109,9 @@ function get_input($id,$art,$value='',$class='form-control',$options=array()){
 			}
 			$out.="</select>";
 			break;
-			
+		case 'password':
+			$out.= '<input class="'.$class.'" type="password" name="'.$id.'" id="'.$id.'" value="'.htmlspecialchars($value).'"'.$readonly.'>';			
+			break;
 		case 'text':
 			$out.='<textarea class="'.$class.'" name="'.$id.'" id="'.$id.'"'.$readonly.'>'.htmlspecialchars($value).'</textarea>';
 			break;
@@ -171,7 +173,7 @@ function echo_saved_cb_dropdown(){
 
 
 function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
-	echo '<form action="?filter=1" method="POST" class="form" role="form">';
+	echo '<form method="POST" class="form" role="form">';
 	if($tfilter){
 	echo '<div class="block">
 	<div class="block-header">Filter</div>
@@ -197,7 +199,8 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 	<input type="hidden" name="setStatusFilter" value=1>';
 	reset($_SESSION['Status']);
 	while(list($key,$v)=each($_SESSION['Status'])){
-		echo_field("s".$v[0],$v[1],'boolean',in_array($v[0],$_SESSION['StatusFilter']),1);
+		echo_field("s".$v[0],$v[1],'boolean',in_array($v[0],$_SESSION['StatusFilter']),
+				(mb_strlen($v[1])>17?round(mb_strlen($v[1])/18+1.5,0):2));
 	}
 	reset($_SESSION['Status']);
 	echo '</div>	
@@ -206,16 +209,13 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 	if($csvoptions){
 	echo '<div class="block">
 	<div class="block-header">
-	CSV Options
+	Download Options
 	</div>
 	
 	<div class="row">
 	<input type="hidden" name="setCSVOptions" value=1>
 	
 	';
-	echo_field("csv_dec",'Decimal Point','SelectValue',$_SESSION['csv_dec'],
-			3,array('selectvalues'=>array('.',',')));
-	echo_field("csv_sep",'Field Separator','SelectValue',$_SESSION['csv_sep'],3,array('selectvalues'=>array(';',',','|','TAB','SPACE')));
 	$tz=array($_SESSION['tz'],"Etc/GMT");
 	for($i=1;$i<=12;$i++){
 		$tz[]='Etc/GMT-'.$i;
@@ -223,8 +223,13 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 	for($i=1;$i<=12;$i++){
 		$tz[]='Etc/GMT+'.$i;
 	}
+	echo_field("format",'File Format','SelectValue','format',3,
+			array('selectvalues'=>array('csv','xlsx','xls')));
 	echo_field("csv_tz",'Timezone','SelectValue',$_SESSION['csv_tz'],3,array('selectvalues'=>$tz));
-	echo_field("csv_dateformat",'Date Format','SelectValue',$_SESSION['csv_dateformat'],3,
+	echo_field("csv_dec",'CSV Decimal Point','SelectValue',$_SESSION['csv_dec'],
+			2,array('selectvalues'=>array('.',',')));
+	echo_field("csv_sep",'CSV Field Separator','SelectValue',$_SESSION['csv_sep'],2,array('selectvalues'=>array(';',',','|','TAB','SPACE')));
+	echo_field("csv_dateformat",'CSV Date Format','SelectValue',$_SESSION['csv_dateformat'],2,
 			array('selectvalues'=>array('Y-m-d H:i:s','d.m.Y H:i:s')));
 	
 	echo '</div>
@@ -233,7 +238,8 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 	echo '
 	<div class="block-action">';
 	echo_button('Update','ok',"","btn btn-primary"); 
-	echo_button('Download CSV','download-alt',"","btn btn-primary",'name="csv"');
+	echo_button('Download','download-alt',"","btn btn-primary",'name="download"');
+//	echo_button('XLSX','download-alt',"","btn btn-primary",'name="xlsx"');
 	if($tfilter){
 		if($name=='Filter')
 			echo_button('Clipboard','pushpin',"?tab=Clipboard");

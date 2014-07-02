@@ -7,10 +7,10 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 0.1.11
+Version: 0.1.15
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
 # Pre-Depends: <comma-separated list of packages>
-Depends: libjs-jquery, libjs-jquery-ui, php5, libapache2-mod-php5, php5-xmlrpc, apache2
+Depends: phpexcel, libjs-jquery, libjs-jquery-ui, php5, libapache2-mod-php5, php5-xmlrpc, apache2
 # Recommends: <comma-separated list of packages>
 # Suggests: <comma-separated list of packages>
 # Provides: <comma-separated list of packages>
@@ -27,9 +27,14 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  bayeos-viewer.ini /etc/
  www/actions.php /usr/share/bayeos-viewer-php/
  www/action_login.php /usr/share/bayeos-viewer-php/
+ www/action_ref.php /usr/share/bayeos-viewer-php/
+ www/action_acl.php /usr/share/bayeos-viewer-php/
+ www/action_object.php /usr/share/bayeos-viewer-php/
+ www/action_chartdata.php /usr/share/bayeos-viewer-php/
  www/constants.php /usr/share/bayeos-viewer-php/
  www/csv.php /usr/share/bayeos-viewer-php/
  www/csv_df.php /usr/share/bayeos-viewer-php/
+ www/xlsx.php /usr/share/bayeos-viewer-php/
  www/search.php /usr/share/bayeos-viewer-php/
  www/fonts/glyphicons-halflings-regular.eot /usr/share/bayeos-viewer-php/
  www/fonts/glyphicons-halflings-regular.woff /usr/share/bayeos-viewer-php/
@@ -74,6 +79,7 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/view_ipauth.php /usr/share/bayeos-viewer-php/
  www/view_login.php /usr/share/bayeos-viewer-php/
  www/view_object.php /usr/share/bayeos-viewer-php/
+ www/view_pw.php /usr/share/bayeos-viewer-php/
  www/view_roles.php /usr/share/bayeos-viewer-php/
  www/view_settings.php /usr/share/bayeos-viewer-php/
  www/view_df_editor.php /usr/share/bayeos-viewer-php/

@@ -4,7 +4,7 @@ if(! isset($_GET['view'])) $_GET['view']='';
 if(is_numeric($_GET['edit']))
 	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['edit'],'int')));
 else 
-	$node=array(0=>1,4=>$_GET['edit']);
+	$node=array(0=>1,4=>$_GET['edit'],5=>'');
 
 $options=array('old_hidden'=>1);
 if(! $node[0]) $options['readonly']=1;
@@ -32,7 +32,7 @@ echo '</ul>';
 }
 if($_GET['view']=='ref'){
 	if($node[0]){
-		echo '<br/><input type="hidden" name="_action_ref_save" value="1">
+		echo '<br/><input type="hidden" name="action" value="ref">
 		'.get_input('refclass','RefClasses','mess_einheit','').'
 		'.get_input("newref",'autocomplete','','',array('refclass'=> "$('#refclass').val()")).'
 		<input type="submit" value="add" name="addref">';
@@ -70,7 +70,7 @@ if($_GET['view']=='ref'){
 			echo '<tr>
 			<td><span class="glyphicon glyphicon-'.$GLOBALS['uname_icon_hash'][$res[$i][6]].'"></span> '.$res[$i][1].'</td>
 			<td class="hidden-xs">'.toDate($res[$i][2]).'</td>
-			<td class="hidden-xs">'.toDate($res[$i][2]).'</td>
+			<td class="hidden-xs">'.toDate($res[$i][3]).'</td>
 			</tr>
 			';
 		}
@@ -103,7 +103,7 @@ if($_GET['view']=='ref'){
 		}
 		if($node[0]){
 			echo '<tr>
-			<td><input type="hidden" name="_action_acl_save" value="1">
+			<td><input type="hidden" name="action" value="acl">
 			'.get_input("newaclid",'autocomplete','','',array('refclass'=> "'acl'",
 					'additional_args'=>'mustMatch: true,')).'
 					</td>
@@ -144,7 +144,7 @@ if($_GET['view']=='ref'){
 						'additional_args'=>'mustMatch: true,'));
 		echo_field("parentroot",'Move to root folder','boolean','',4);
 	}
-	echo '</div></div>';
+	echo '<input type="hidden" name="action" value="object"></div></div>';
 	$ofields=get_object_fields($node[4]);
 	if(count($ofields)){
 		echo '<div class="block">

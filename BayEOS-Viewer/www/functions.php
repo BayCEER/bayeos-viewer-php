@@ -12,6 +12,12 @@ function add_alert($text,$type='success',$dismissable=TRUE){
 	$text.'</div>';
 }
 
+function updateCookies(){
+	setcookie('cb_saved',serialize($_SESSION['cb_saved']),time()+3600*24*180);
+	setcookie('max_cols',$_SESSION['max_cols'],time()+3600*24*180);
+	setcookie('max_rows',$_SESSION['max_rows'],time()+3600*24*180);
+}
+
 function get_object_fields($uname){
 	switch($uname){
 		case 'messung_ordner':

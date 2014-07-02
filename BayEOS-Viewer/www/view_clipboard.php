@@ -2,8 +2,9 @@
 $clipboard=count($_SESSION['clipboard']);
 if(! $clipboard){
 	echo '<div class="alert alert-warning">Your clipboard is empty.</div>
-	';
-	echo_saved_cb_dropdown(); 
+	<div class="block-action dropdown">';
+	echo_saved_cb_dropdown();
+	echo '</div>';
 }
 else {
 	echo_table($_SESSION['clipboard'],"remove");

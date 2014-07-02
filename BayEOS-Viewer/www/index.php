@@ -8,8 +8,8 @@
  *  |  |- xmlrpc.inc
  *  |  |- constants.php
  *  |-actions.php
- *     |- action_login.php
- *     |- ...
+ *  |  |- action_login.php
+ *  |  |- ...
  *  |-views.php
  *     |- view_header.php
  *     |- ... 
@@ -39,6 +39,9 @@ switch ($_SESSION['tab']){
 		break;
 	case 'IP Authentication':
 		require 'view_ipauth.php';
+		break;
+	case 'Change Password':
+		require 'view_pw.php';
 		break;
 	case 'User/Groups':
 		require 'view_roles.php';
