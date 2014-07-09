@@ -30,6 +30,9 @@ for($i=0;$i<count($tabs);$i++){
 }
 echo '</ul>';
 }
+/**************************************************
+ * Reference Tab
+ *************************************************/
 if($_GET['view']=='ref'){
 	if($node[0]){
 		echo '<br/><input type="hidden" name="action" value="ref">
@@ -77,10 +80,11 @@ if($_GET['view']=='ref'){
 		?>
 	</tbody>
 </table>
-</div></div>
+
 <?php
-
-
+/*******************************************
+ * ACL Tab
+ *******************************************/
 } elseif($_GET['view']=='acl'){
 	$res=xml_call('RightHandler.getRights',array(new xmlrpcval($_GET['edit'],'int')));
 	$res=$res[0];
@@ -134,8 +138,10 @@ if($_GET['view']=='ref'){
 		?>
 	</tbody>
 </table>
-</div></div>
 <?php
+/*******************************************
+ * Details Tab
+ *******************************************/
 } elseif($_GET['view']=='') {
 	echo_field("t5",'Name','string',$node[5],4,$options);
 	if($node[0] && is_numeric($_GET['edit'])){
@@ -144,15 +150,9 @@ if($_GET['view']=='ref'){
 						'additional_args'=>'mustMatch: true,'));
 		echo_field("parentroot",'Move to root folder','boolean','',4);
 	}
-	echo '<input type="hidden" name="action" value="object"></div></div>';
+	echo '<input type="hidden" name="action" value="object">';
 	$ofields=get_object_fields($node[4]);
 	if(count($ofields)){
-		echo '<div class="block">
-		<div class="block-header">
-		Object
-		</div>
-		<div class="row">
-		';
 		$objekt=xml_call('ObjektHandler.getObjekt',
 				array(new xmlrpcval($_GET['edit'],'int'),
 						new xmlrpcval($node[4],'string')));
@@ -163,12 +163,12 @@ if($_GET['view']=='ref'){
 					$value,$ofields[$i]['cols'],$options);
 
 		}
-		echo '</div></div>';
 	}
 } else {
 	require 'view_'.$_GET['view'].'.php';
 }
 echo '
+</div></div>
 <div class="block-action">';
 if(is_numeric($_GET['edit'])){
 	if($node[0]) 
@@ -184,6 +184,10 @@ if(is_numeric($_GET['edit'])){
 			break;
 		case 'data_column':
 			echo_button('Data Frame','edit','?view=df_editor&edit='.$node[3]);
+			break;
+		case 'data_frame':
+			if($_GET['view']=='df_export')
+				echo_button('Download CSV','download-alt',"","btn btn-primary",'name="csv_df" id="csv_submit"');
 			break;
 	}
 	

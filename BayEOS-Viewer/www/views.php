@@ -3,18 +3,18 @@
  * Views 
  ***********************************************************/
 function get_path($path,$max=30){
-	$tmp=explode("/",$path);
+	$current=explode("/",$path);
 	$out='';
-	for($i=count($tmp)-1;$i>=0;$i--){
-		if($tmp[$i]){
+	for($i=count($current)-1;$i>=0;$i--){
+		if($current[$i]){
 			if(mb_strlen($out)>$max){
 				$out='.../'.$out;
 				return $out;
 			}
-			$out=$tmp[$i].'/'.$out;
+			$out=$current[$i].'/'.$out;
 		}
 	}
-	if($tmp[0]!='.')
+	if($current[0]!='.')
 		$out='/'.$out;
 	return $out;
 }
@@ -23,7 +23,7 @@ function echo_button($name,$icon,$url='',$class='btn btn-default',$button_attr='
 	echo "\n";
 	if($url) echo '<a href="'.$url.'" class="'.$class.'" >';
 	else echo '<button class="'.$class.'" '.$button_attr.'>';
-	echo '<span class="glyphicon glyphicon-'.$icon.'"></span> '.$name;
+	echo '<span class="glyphicon glyphicon-'.$icon.'"></span> <span class="hidden-xs">'.$name.'</span>';
 	if($url) echo '</a>';
 	else echo '</button>';
 		
@@ -178,7 +178,7 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 	echo '<div class="block">
 	<div class="block-header">Filter</div>
 	<div class="row">
-	<input type="hidden" name="setFilter" value=1>
+	<input type="hidden" name="action" value="filter">
 	';
 	echo_field("session_from",'From','dateTime.iso8601',toDateFromString($_SESSION['from']),3);
 	echo_field("session_until",'Until','dateTime.iso8601',toDateFromString($_SESSION['until']),3);
@@ -253,6 +253,34 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 }
 
 
+function echo_pagination($max,$current=1,$qs='',$step=10){
+	if($max<=$step) return;
+	echo '<ul class="pagination">';
+	
+	$pag=array($current);
+	$current_step=1;
+	while(($current-$current_step)>=1){
+		$pag[]=floor(($current-$current_step)/$current_step)*$current_step;
+		$current_step*=10;
+	}
+	$current_step=1;
+	while(($current+$current_step)<=ceil($max/$step)){
+		$pag[]=ceil(($current+$current_step)/$current_step)*$current_step;
+		$current_step*=10;
+	}
+	sort($pag);
+	
+	
+	echo '<li'.($current>1?'':' class="disabled"').'><a href="?page=0'.$qs.'">&laquo;</a></li>';
+		
+	echo '<li'.($current>1?'':' class="disabled"').'><a href="?page='.($current-1).$qs.'">&lsaquo;</a></li>';
+	for($i=0;$i<count($pag);$i++){
+		echo '<li'.($current==$pag[$i]?' class="active"':'').'><a href="?page='.$pag[$i].$qs.'">'.$pag[$i].'</a></li>';
+	}
+	echo '<li'.(($current)>=ceil($max/$step)?' class="disabled"':'').'><a href="?page='.($current+1).$qs.'">&rsaquo;</a></li>';
+	echo '<li'.(($current)>=ceil($max/$step)?' class="disabled"':'').'><a href="?page='.ceil($max/$step).$qs.'">&raquo;</a></li>';
+	echo '</ul>';
+}
 
 function echo_table($childs,$action="add"){
 	$with_path=isset($childs[0]['path']);
@@ -266,7 +294,7 @@ function echo_table($childs,$action="add"){
 		<th class="hidden-xs">Folder</th>
 		<?php }?>
 		<th class="hidden-xs">Records from</th>
-		<th class="hidden-xs">Records until</th>
+		<th>Records until</th>
 		<?php if($action=='remove'){?>
 		<th><a href="./?remove=all" class="btn btn-xs btn-default">
 					<span class="glyphicon glyphicon-remove"></span> Remove all</a></th>
@@ -285,24 +313,24 @@ function echo_table($childs,$action="add"){
 			<a href="?tab=Folders&id='.$childs[$i]['path'][0].'">'.get_path($childs[$i]['path'][1],40).'</a>
 							</td>':'').'
 			<td class="hidden-xs">'.toDate($childs[$i][6]).'</td>
-			<td class="hidden-xs">'.toDate($childs[$i][7]).'</td>
+			<td>'.toDate($childs[$i][7]).'</td>
 			<td class="link">
 			';
 			if($childs[$i][4]=='messung_massendaten' || $childs[$i][4]=='messung_ordner'){
 			switch($action){
 				case 'add':
 					echo '<a href="./?add='.$childs[$i][2].'" class="btn btn-xs btn-default">
-	         		<span class="glyphicon glyphicon-pushpin"></span> To Clipboard</a>';
+	         		<span class="glyphicon glyphicon-pushpin"></span> <span class="hidden-xs">To Clipboard</span></a>';
 					break;
 				case 'remove':
 					echo '<a href="./?remove='.$childs[$i][2].'" class="btn btn-xs btn-default">
-					<span class="glyphicon glyphicon-remove"></span> Remove</a>';
+					<span class="glyphicon glyphicon-remove"></span> <span class="hidden-xs">Remove</span></a>';
 					break;
 						
 			}
 			}
 			echo '<a href="./?edit='.$childs[$i][2].(strstr($childs[$i][4],'messung_')?'&tab=Folders':'').'" class="btn btn-xs btn-default">
-					<span class="glyphicon glyphicon-edit"></span> Details</a>';
+					<span class="glyphicon glyphicon-edit"></span> <span class="hidden-xs">Details</span></a>';
 			echo '	
 			</td>
 			</tr>
@@ -317,4 +345,42 @@ function echo_table($childs,$action="add"){
 	<?php 
 		
 }
+
+function echo_dbtable($res,$header,$action='',$qs='',$icon='',$edit=array('del','edit'),$step=10){
+	echo_pagination(pg_num_rows($res),$_GET['page'],$qs,$step);
+	
+	?>
+	
+	<table class="table table-hover col-sm-12">
+	<thead>
+	<tr>
+	<?php for($i=0;$i<count($header);$i++){?>
+	<th><?php echo $header[$i];?></th>
+	<?php }?>
+	</tr>
+	</thead>
+	<tbody>
+	
+	<?php 
+			for($i=($_GET['page']-1)*10;$i<min(pg_num_rows($res),$_GET['page']*10);$i++){
+				$r=pg_fetch_row($res,$i);
+				echo '<tr><td>'.($icon?'<span class="glyphicon glyphicon-'.$icon.'"></span> ':'').$r[0].'</td>';
+				for($j=1;$j<count($header);$j++){
+					echo '<td>'.$r[$j].'</td>';
+				}
+				echo '<td>'.(in_array('del',$edit)?'
+						<a href="./?action='.$action.'&del='.urlencode($r[0]).$qs.'" class="btn btn-xs btn-default" 
+				 onClick="return confirm(\'Do you really want to delete this item?\');">
+						<span class="glyphicon glyphicon-remove"></span> <span class="hidden-xs">Delete</span></a>':'').
+				 (in_array('edit',$edit)?'<a href="./?edit='.urlencode($r[0]).$qs.'" class="btn btn-xs btn-default">
+						<span class="glyphicon glyphicon-edit"></span> <span class="hidden-xs">Edit</span></a>':'').'
+				</td></tr>';
+			}
+			
+	?>
+		</tbody>
+	</table>
+<?php 		
+}
+
 ?>

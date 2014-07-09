@@ -1,11 +1,13 @@
 <?php 
 //Limit Plotting to five series
+
 if(count($_SESSION['clipboard'])>$_SESSION['max_cols']){
 	$max_i=$_SESSION['max_cols'];
-	echo '<div class="alert alert-warning">You have more than '.$_SESSION['max_cols'].
+	add_alert('You have more than '.$_SESSION['max_cols'].
 	' series on your clipboard. Only first '.$_SESSION['max_cols'].' will get plotted.
 	Change <a href="?tab=Settings" class="alert-link">settings</a> or remove series from your 
-	<a href="?tab=Clipboard" class="alert-link">clipboard</a>.</div>';
+	<a href="?tab=Clipboard" class="alert-link">clipboard</a>.','warning');
+	echo $GLOBALS['alert'];
 } else 
 	$max_i=count($_SESSION['clipboard']);
 
@@ -13,7 +15,8 @@ if($max_i==0){
 	add_alert("Your clipboard is empty",'warning');
 	echo $GLOBALS['alert'];
 } else {
-
+	$readonly=!$_SESSION['clipboard'][0][0];
+	
 //Auto adjust resolution for large intervals
 $series=array();
 $sec=toEpoch($_SESSION['until'])-toEpoch($_SESSION['from']);
@@ -60,7 +63,26 @@ for($i=0;$i<$max_i;$i++){
 	checkres($sec,$_SESSION['clipboard'][$i]['res']);
 }
 
+
+if($_SESSION['gnuplot']){
 ?>
+<script>
+var width=$(window).width();
+if(width>1200) width=1140;
+else if(width>992) width=940;
+else if(width>768) width=720;
+else width=width-48;
+
+<?php 
+if($_SESSION['chartmulti']){
+	for($i=0;$i<$max_i;$i++){ ?>
+		document.write('<img src="chart.php?x='+width+'&i=<?php echo $i;?>"><br/>');
+<?php }
+} else { ?>
+document.write('<img src="chart.php?x='+width+'">');
+<?php }?>
+</script>
+<?php } else { ?>
 
 <script src="js/d3.min.js"></script>
 <script src="js/rickshaw.min.js"></script>
@@ -77,7 +99,6 @@ function setSelectedTSTable(){
 
 	if(keys.length==0){
 		$('#selected_ts').html('');
-		$('#delete_bt').prop("disabled","disabled");
 		return;
 	}
 	$('#selected_ts').html('<div class="col-xs-12"><b>Selected Timestamps:</b></div>');
@@ -89,7 +110,6 @@ function setSelectedTSTable(){
 				'<span class="glyphicon glyphicon-remove"></span></a></div>');
 	}
     $('#selected_ts').append('<div class="col-xs-12"><hr/></div>');
-    $('#delete_bt').prop("disabled",null);
 }
 
 function addLeadingZeros(number, length) {
@@ -128,13 +148,15 @@ for($p=0;$p<count($series);$p++){
 		<div id="preview<?php echo $p;?>"></div>
 		</div>	
 <script>
-<?php if($_SESSION['chartdata']){?>
+<?php 
+if(! $readonly){ //set the onClick handler of the chart
+if($_SESSION['chartdata']){?>
 $('#chart<?php echo $p;?>').on('click', function() { $("#cb"+currentX).prop('checked',true);});
 <?php } else { ?>
-$('#chart<?php echo $p;?>').on('click', function() { selectedX[currentX]=1; setSelectedTSTable();
-//set_from_until('',currentX,currentX);
-});
-<?php } ?>
+$('#chart<?php echo $p;?>').on('click', function() { selectedX[currentX]=1; setSelectedTSTable();});
+<?php }
+} 
+?>
 	
 var graph<?php echo $p;?> = new Rickshaw.Graph({
 	element: document.querySelector("#chart<?php echo $p;?>"),
@@ -217,7 +239,9 @@ var preview<?php echo $p;?> = new Rickshaw.Graph.RangeSlider( {
 	graph: graph<?php echo $p;?>,
 	element: document.getElementById('preview<?php echo $p;?>'),
 } );
+<?php if(! $readonly){ ?>
 preview<?php echo $p;?>.slideCallbacks=[set_from_until];
+<?php }?>
 
 var hoverDetail<?php echo $p;?> = new Rickshaw.Graph.HoverDetail( {
 	graph: graph<?php echo $p;?>,
@@ -275,7 +299,7 @@ yAxis<?php echo $p;?>.render();
 <?php
 }
 if($no_data) echo '<div class="alert alert-danger">At least on series returns no data. Plotting will not work.</div>';
-
+} //rickshaw ploting
 } // clipboard empty!
 //Actionblock for zoom, move + data
 echo '
@@ -290,7 +314,7 @@ if(count($_SESSION['clipboard'])>1){
 	if($_SESSION['chartmulti']) echo_button('Single Plot','resize-small',"?chartmulti=0");
 	else echo_button('Multiple Plots','resize-full',"?chartmulti=1");
 }
-if(! $_SESSION['agrfunc'] || ! $_SESSION['agrint']){
+if(($_SESSION['agrfunc']=='' || $_SESSION['agrint']=='') && ! $_SESSION['gnuplot']){
 	if($_SESSION['chartdata']) echo_button('Hide Data','arrow-up',"?chartdata=0");
 	else echo_button('Show Data','arrow-down',"?chartdata=1");
 }
@@ -300,7 +324,6 @@ echo '
 
 if($max_i){
 //Datablock
-$readonly=!$_SESSION['clipboard'][0][0];
 if($_SESSION['chartdata']){
 	$status=array();
 	while(list($k,$v)=each($_SESSION['Status'])){
@@ -375,7 +398,7 @@ if($_SESSION['chartdata']){
 		<br/>
 		<button class="btn btn-primary" type="submit" id="set_status">
 		<span class="glyphicon glyphicon-ok"></span> Set Status</button>
-	 <button id="delete_bt" class="btn btn-primary" type="submit" name="_action_remove" disabled="disabled"
+	 <button id="delete_bt" class="btn btn-primary" type="submit" name="_action_remove"
 	  onclick="return confirm(\'Do you really want to delete data points for the selected timestamps?\');">
 	<span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</div>
@@ -390,5 +413,9 @@ if($_SESSION['chartdata']){
 
 
 echo_filter_form();
+
+echo '<p>Note: If plotting does not work for you, your device may not support the plot library. In this case you 
+can change your <a href="?tab=Settings">settings</a> to <b>render plot as image</b>.</p>';
+
 }
 ?>

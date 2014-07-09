@@ -1,12 +1,25 @@
 <?php 
+if(isset($_POST['offset'])) $_GET['offset']=$_POST['offset'];
+if(! isset($_GET['offset'])) $_GET['offset']=0;
+$step=10;
+if($_GET['offset']<0) $_GET['offset']=0;
+
+$nr=array();
+for($i=($_GET['offset']+1);$i<=($_GET['offset']+$step);$i++){
+	$nr[]=$i;
+}
 
 $res=xml_call('DataFrameHandler.getFrameRows',array(new xmlrpcval($_GET['edit'],'int'),
-		new xmlrpcval(null,'null')));
+		xmlrpc_array($nr,'int')
+		));
 $input_mapper=array('STRING'=>'string','DOUBLE'=>'string','INTEGER'=>'string','BOOLEAN'=>'boolean','DATE'=>'dateTime.iso8601');
 $xml_mapper=array('STRING'=>'string','DOUBLE'=>'double','INTEGER'=>'int','BOOLEAN'=>'boolean','DATE'=>'dateTime.iso8601');
 $options=array('old_hidden'=>1);
 if(! $node[0]) $options['readonly']=1;
+$max=$res[1][count($res[1])-1][0];
+echo_pagination($max+100,$_GET['offset'],"&view=df_editor&edit=$_GET[edit]",$step);
 ?>
+<input type="hidden" name="offset" value="<?php echo $_GET['offset'];?>">
 <input type="hidden" name="action" value="df">
 <table class="table table-hover col-sm-12">
 	<thead>
@@ -18,26 +31,27 @@ if(! $node[0]) $options['readonly']=1;
 			<input type="hidden" name="ctyp[]" value="'.$xml_mapper[$res[0][$i][3]].'">
 			<input type="hidden" name="cid[]" value="'.$res[0][$i][0].'">
 			'.$res[0][$i][2].'
-			<a href="?edit='.$res[0][$i][0].'" class="btn btn-xs btn-default" ><span class="glyphicon glyphicon-edit"></span> edit</a>
+			<a href="?edit='.$res[0][$i][0].'" class="btn btn-xs btn-default" >
+			<span class="glyphicon glyphicon-edit"></span> edit</a>
 			</th>';
 		}
 		
 		?>
-		<th><a href="?edit=data_column" class="btn btn-xs btn-default" ><span class="glyphicon glyphicon-plus"></span> New Data Column</a></th>
+		<th><a href="?edit=data_column" class="btn btn-xs btn-default" >
+		<span class="glyphicon glyphicon-plus"></span> New Column</a></th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-		$i=1;
-		$max=$res[1][count($res[1])-1][0];
+		$i=$_GET['offset']+1;
 		$ri=0;
-		while($i<=($max+1)){
+		while($i<=($_GET['offset']+$step)){
 			echo '<tr>
 			<td><input type="hidden" name="r[]" value="'.$i.'">'.$i.'</td>';
+			while(isset($res[1][$ri]) && $res[1][$ri][0]<$i) $ri++;
 			if($res[1][$ri][0]==$i){
 				//Has data!
 				$data=$res[1][$ri];
-				$ri++;
 			} else 
 				$data=array();
 			for($j=0;$j<count($res[0]);$j++){
@@ -55,4 +69,4 @@ if(! $node[0]) $options['readonly']=1;
 		?>
 	</tbody>
 </table>
-</div></div>
+

@@ -2,5 +2,9 @@ Alias /bayeosViewer /usr/share/bayeos-viewer-php/www
 <Directory /usr/share/bayeos-viewer-php/www/>
   Order allow,deny
   Allow from all
+  <FilesMatch "(action|view).*\.php$">
+     Order Deny,Allow
+     Deny from all
+  </FilesMatch>
 </Directory>
 

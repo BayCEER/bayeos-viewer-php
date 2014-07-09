@@ -21,8 +21,8 @@
 <link rel="stylesheet"
 	href="/javascript/jquery-ui/css/smoothness/jquery-ui.min.css">
 <script type="text/javascript" src="js/jquery.datetimeentry.pack.js"></script>
-<script type="text/javascript"
-	src="/javascript/jquery-ui/jquery.mousewheel.js"></script>
+<!-- <script type="text/javascript"
+	src="/javascript/jquery-ui/jquery.mousewheel.js"></script>-->
 <style type="text/css">
 @import "js/jquery.datetimeentry.css";
 </style>
@@ -53,16 +53,18 @@
 								'Clipboard'=>array('icon'=>'pushpin'),
 								'Chart'=>array('icon'=>'signal'),
 								'Admin'=>array('icon'=>'wrench',
-										'dropdown'=>array('Units'=>array('icon'=>'tag'),
+										'dropdown'=>array(
+												'Settings'=>array('icon'=>'wrench'),
+												'Change Password'=>array('icon'=>'refresh'),
+												'sep1'=>1,
+												'Units'=>array('icon'=>'tag'),
 												'Targets'=>array('icon'=>'arrow-right'),
 												'Devices'=>array('icon'=>'hdd'),
 												'Locations'=>array('icon'=>'home'),
 												'Compartments'=>array('icon'=>'th-large'),
-												'sep'=>1,
-												'User/Groups'=>array('icon'=>'user'),
-												'IP Authentication'=>array('icon'=>'cloud'),
-												'Settings'=>array('icon'=>'wrench'),
-												'Change Password'=>array('icon'=>'refresh')
+												'sep2'=>1,
+												'User/Roles'=>array('icon'=>'user'),
+												'IP Authentication'=>array('icon'=>'cloud')
 										)));
 						while(list($key,$value)=each($nav)){
 							if(isset($value['dropdown'])){
@@ -73,7 +75,7 @@
 								<ul class="dropdown-menu">
 								';
 								while(list($key2,$value2)=each($value['dropdown'])){
-									if($key2=='sep')
+									if(strstr($key2,'sep'))
 										echo '<li class="divider"></li>';
 									else 
 										echo '
@@ -116,6 +118,8 @@
 
 		</nav>
 		<div class="container">
-			<?php 	
+<?php 	
 echo $GLOBALS['alert'];
+$GLOBALS['alert']='';
+
 ?>

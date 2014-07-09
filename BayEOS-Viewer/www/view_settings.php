@@ -4,8 +4,9 @@
 <div class="row">
 <input type="hidden" name="action" value="settings">
 <?php
-echo_field("max_cols",'Maximum number of series','INT',$_SESSION['max_cols'],6);
-echo_field("max_rows",'Maximum number of datapoints','INT',$_SESSION['max_rows'],6);
+echo_field("max_cols",'Maximum number of series','INT',$_SESSION['max_cols'],4);
+echo_field("max_rows",'Maximum number of datapoints','INT',$_SESSION['max_rows'],4);
+echo_field("gnuplot",'Render plot as image (Check if normal chart plotting does not work on your device)','boolean',$_SESSION['gnuplot'],4);
 ?>
 </div>
 </div>

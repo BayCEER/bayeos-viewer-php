@@ -83,18 +83,28 @@ if($_REQUEST['action']=='object')
 if($_REQUEST['action']=='chartdata')
 	require 'action_chartdata.php';
 
+/***********************************************************
+ * Massendaten Update + Delete
+***********************************************************/
+if($_REQUEST['action']=='ts')
+	require 'action_ts.php';
+
+/***********************************************************
+ * User actions
+***********************************************************/
+if($_REQUEST['action']=='user')
+	require 'action_user.php';
+
+/***********************************************************
+ * User actions
+***********************************************************/
+if($_REQUEST['action']=='ipauth')
+	require 'action_ipauth.php';
+
 
 /***********************************************************
  * DataFrame
  ***********************************************************/
-if(isset($_POST['csv_df'])){
-	$_SESSION['csv_dec']=$_POST['csv_dec'];
-	$_SESSION['csv_sep']=$_POST['csv_sep'];
-	$_SESSION['csv_tz']=$_POST['csv_tz'];
-	$_SESSION['csv_dateformat']=$_POST['csv_dateformat'];
-	header('Location: ./csv_df.php?id='.$_GET['edit']);
-}
-
 if($_REQUEST['action']=='df'){
 	$res=0;
 	for($i=0;$i<count($_POST['cid']);$i++){
@@ -136,7 +146,7 @@ if($_REQUEST['action']=='df'){
 /***********************************************************
  * Change Password
 ***********************************************************/
-if(isset($_POST['password2'])){
+if($_REQUEST['action']=='password'){
 	if($_POST['password2']!=$_POST['password'])
 		add_alert('Passwords do not match','warning');
 	elseif(strlen($_POST['password'])<4)
@@ -163,6 +173,7 @@ if(isset($_GET['cb_del']) && isset($_SESSION['cb_saved'][$_GET['cb_del']])){
 if($_REQUEST['action']=='settings'){
 	$_SESSION['max_cols']=$_POST['max_cols'];
 	$_SESSION['max_rows']=$_POST['max_rows'];
+	$_SESSION['gnuplot']=$_POST['gnuplot'];
 	updateCookies();
 	add_alert('Settings saved');
 	
@@ -235,42 +246,10 @@ if(isset($_GET['remove'])){
 /***********************************************************
  * Filter
  ***********************************************************/
-//Set StatusFilter 
-if(isset($_POST['setStatusFilter'])){
-	$_SESSION['StatusFilter']=array();
-	while(list($key,$v)=each($_SESSION['Status'])){
-		if(isset($_POST['s'.$v[0]])) $_SESSION['StatusFilter'][]=$v[0];
-	}
-	reset($_SESSION['Status']);
-}
+if($_REQUEST['action']=='filter')
+	require 'action_filter.php';
 
-if(isset($_POST['setCSVOptions'])){
-	$_SESSION['csv_dec']=$_POST['csv_dec'];
-	$_SESSION['csv_sep']=$_POST['csv_sep'];
-	$_SESSION['csv_tz']=$_POST['csv_tz'];
-	$_SESSION['csv_dateformat']=$_POST['csv_dateformat'];
-}
 
-if(isset($_POST['setFilter'])){
-	if(isset($_POST['download'])){
-		if(isset($_POST['session_from'])) $_SESSION['csv_from']=toiso8601($_POST['session_from']);
-		if(isset($_POST['session_until'])) $_SESSION['csv_until']=toiso8601($_POST['session_until']);
-		$_SESSION['csv_agrint']=$_POST['session_agrint'];
-		$_SESSION['csv_agrfunc']=$_POST['session_agrfunc'];
-		if($_POST['format']=='csv') header('Location: ./csv.php');
-		else header('Location: ./xlsx.php?format='.$_POST['format']);
-		exit();
-	} else {
-		if(isset($_POST['session_from'])) $_SESSION['from']=toiso8601($_POST['session_from']);
-		if(isset($_POST['session_until'])) $_SESSION['until']=toiso8601($_POST['session_until']);
-		$_SESSION['agrint']=$_POST['session_agrint'];
-		$_SESSION['agrfunc']=$_POST['session_agrfunc'];
-	}
-	if(isset($_POST['chart'])){
-		$_SESSION['tab']='Chart';
-	}
-	
-}
 if(isset($_GET['zoom'])){
 	$step=toEpoch($_SESSION['until'])-toEpoch($_SESSION['from']);
 	$_SESSION['until']=toios8601FromEpoch(toEpoch($_SESSION['until'])-$_GET['zoom']*round($step/4));

@@ -2,7 +2,7 @@
 /**********************************************************
  * Produces a gnuplot
  * 
- * currently not used in the application
+ * could be used for devices that do not support rickshaw plot
  *********************************************************/
 require './functions.php';
 
@@ -22,13 +22,20 @@ if(! count($_SESSION['clipboard'])){
 }
 
 $prefix=tempnam("/dev/shm/",'bayeos');
-if(! $_GET['x']) $_GET['x']=640;
-//if(! $_GET['y']) $_GET['y']=480;
-if($_GET['x']>1024) $_GET['x']=1024;
-//if($_GET['y']>768) $_GET['y']=768;
-$_GET['y']=round(3*$_GET['x']/4);
+if(! isset($_GET['x'])) $_GET['x']=640;
+$_GET['y']=round($_GET['x']/2);
+if($_GET['y']>350) $_GET['y']=350;
 
-if($_GET['x']<400) $font=8;
+if(isset($_GET['i'])){
+	$min_i=$_GET['i'];
+	$max_i=$_GET['i']+1;
+} else {
+	$min_i=0;
+	$max_i=count($_SESSION['clipboard']);
+}
+
+if($_GET['x']<300) $font=7;
+elseif($_GET['x']<400) $font=8;
 elseif($_GET['x']<500) $font=9;
 elseif($_GET['x']<600) $font=10;
 else $font=11;
@@ -48,11 +55,11 @@ $gp='set terminal png truecolor font "arial,'.$font.'" size '.$_GET['x'].','.$_G
 		plot ';
 
 $datafiles=array();
-for($i=0;$i<count($_SESSION['clipboard']);$i++){
+for($i=$min_i;$i<$max_i;$i++){
 	
 	$datafiles[$i]="$prefix.$i.txt";
 	$f=fopen($datafiles[$i],'w');
-	if($_SESSION['agrfunc']==-1 || $_SESSION['agrint']==-1){
+	if($_SESSION['agrfunc']=='' || $_SESSION['agrint']==''){
 		$val=xml_call('MassenTableHandler.getRows',
 		array(new xmlrpcval($_SESSION['clipboard'][$i][2],'int'),
 				new xmlrpcval(array(new xmlrpcval($_SESSION['from'],'dateTime.iso8601'),
@@ -88,7 +95,7 @@ for($i=0;$i<count($_SESSION['clipboard']);$i++){
 		}	
 	}
 	fclose($f);
-	$gp.=($i>0?', ':'').'"'.$datafiles[$i].'" using 1:3 axes x1y1 title "'.$_SESSION['clipboard'][$i][5].'" with lines lt '.($i+1);
+	$gp.=($i>$min_i?', ':'').'"'.$datafiles[$i].'" using 1:3 axes x1y1 title "'.$_SESSION['clipboard'][$i][5].'" with lines lt '.($i+1);
 }
 $f=fopen($prefix.'.gp','w');
 fwrite($f,$gp."\n");

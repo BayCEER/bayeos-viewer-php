@@ -12,10 +12,25 @@ function add_alert($text,$type='success',$dismissable=TRUE){
 	$text.'</div>';
 }
 
+function DBQueryParams($query,$params){
+	if(! $GLOBALS['conn'])
+		$GLOBALS['conn']=pg_connect($_SESSION['dbConnection']);
+	if(! $GLOBALS['conn']){
+		add_alert('Could not get database connection','danger');
+		return false;
+	}
+	$res=pg_query_params($GLOBALS['conn'],$query, $params);
+	if(! $res){
+		add_alert(pg_last_error($GLOBALS['conn']),'danger');
+	}
+	return $res;
+}
+
 function updateCookies(){
 	setcookie('cb_saved',serialize($_SESSION['cb_saved']),time()+3600*24*180);
 	setcookie('max_cols',$_SESSION['max_cols'],time()+3600*24*180);
 	setcookie('max_rows',$_SESSION['max_rows'],time()+3600*24*180);
+	setcookie('gnuplot',$_SESSION['gnuplot'],time()+3600*24*180);
 }
 
 function get_object_fields($uname){
@@ -86,19 +101,23 @@ function get_object_fields($uname){
 }
 
 
-function getUserGroups($tag){
+function getUserGroups($tag,$select=''){
 	if(! isset($_SESSION['Benutzer']))
 		$_SESSION['Benutzer']=xml_call('LookUpTableHandler.getBenutzer',array());
 	if(! isset($_SESSION['Gruppen']))
 		$_SESSION['Gruppen']=xml_call('LookUpTableHandler.getGruppen',array());
 	$res=array();
-	for($i=0;$i<count($_SESSION['Gruppen']);$i++){
-		if(strstr($_SESSION['Gruppen'][$i][20],$tag))
-			$res[]=array('label'=>$_SESSION['Gruppen'][$i][20],'value'=>$_SESSION['Gruppen'][$i][20],'id'=>$_SESSION['Gruppen'][$i][2]);
+	if($select=='' || $select=='Gruppen'){
+		for($i=0;$i<count($_SESSION['Gruppen']);$i++){
+			if(strstr($_SESSION['Gruppen'][$i][20],$tag))
+				$res[]=array('label'=>$_SESSION['Gruppen'][$i][20],'value'=>$_SESSION['Gruppen'][$i][20],'id'=>$_SESSION['Gruppen'][$i][2]);
+		}
 	}
-	for($i=0;$i<count($_SESSION['Benutzer']);$i++){
-		if(strstr($_SESSION['Benutzer'][$i][20],$tag))
-			$res[]=array('label'=>$_SESSION['Benutzer'][$i][20],'value'=>$_SESSION['Benutzer'][$i][20],'id'=>$_SESSION['Benutzer'][$i][2]);
+	if($select=='' || $select=='Benutzer'){
+		for($i=0;$i<count($_SESSION['Benutzer']);$i++){
+			if(strstr($_SESSION['Benutzer'][$i][20],$tag))
+				$res[]=array('label'=>$_SESSION['Benutzer'][$i][20],'value'=>$_SESSION['Benutzer'][$i][20],'id'=>$_SESSION['Benutzer'][$i][2]);
+		}
 	}
 	reset($_SESSION['Benutzer']);
 	reset($_SESSION['Gruppen']);

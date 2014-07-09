@@ -38,14 +38,14 @@ $df=xml_call('DataFrameHandler.getFrameRows',array(new xmlrpcval($_GET['id'],'in
 		new xmlrpcval(null,'null')));
 
 
-$head="Nr.";
+$head="";
 $cols=count($df[0]);
 for($i=0;$i<$cols;$i++){
-	$head.=$_SESSION['csv_sep'].$df[0][$i][2];
+	$head.=($i>0?$_SESSION['csv_sep']:'').$df[0][$i][2];
 	$res=xml_call('ObjektHandler.getLowestRefObjekt',
 			array(new xmlrpcval($df[0][$i][0],'int'),
 					new xmlrpcval('mess_einheit','string')));
-	$out.=$_SESSION['csv_sep'].$res[20];
+	$out.=($i>0?$_SESSION['csv_sep']:'').$res[20];
 }
 $out.="\n$head\n";		
 function csv_value($value,$type){
@@ -65,13 +65,17 @@ function csv_value($value,$type){
 			return $value;
 	}
 }
-
+$row_nr=1;
 for($i=0;$i<count($df[1]);$i++){
-	$out.=$df[1][$i][0];
+	while($row_nr<$df[1][$i][0]){
+		$out.="\n";
+		$row_nr++;
+	}
 	for($j=0;$j<$cols;$j++){
-		$out.=$_SESSION['csv_sep'].csv_value($df[1][$i][$j+1],$df[0][$j][3]);
+		$out.=($j>0?$_SESSION['csv_sep']:'').csv_value($df[1][$i][$j+1],$df[0][$j][3]);
 	}
 	$out.="\n";
+	$row_nr++;
 }
 header("Content-Length: " . strlen($out));
 header("Content-type: text/x-csv charset=UTF-8");

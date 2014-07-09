@@ -16,6 +16,8 @@ if(! isset($_SESSION['bayeosauth'])){
 $return=array();
 if($_GET['refclass']=='acl'){
 	$return=getUserGroups($_GET['search']);
+} elseif($_GET['refclass']=='roles'){
+	$return=getUserGroups($_GET['search'],'Gruppen');
 } elseif($_GET['refclass']){
 	$res=xml_call('TreeHandler.getAllChildren',
 				array(new xmlrpcval(get_root_id($_GET['refclass']),'int'),

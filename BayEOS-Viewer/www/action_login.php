@@ -9,6 +9,17 @@ $res = xml_call("LoginHandler.createSession",
 if($res===false) {
 
 } else {
+	$_SESSION['username']=$_POST['login'];
+	if(isset($config['dbConnection'])){//Checking for Admin-Rights
+		$_SESSION['dbConnection']=$config['dbConnection'];
+		$dbres=DBQueryParams('select id from benutzer where login=$1 and admin',array($_POST['login']));
+		if($dbres && pg_num_rows($dbres)){
+			list($_SESSION['userid'])=pg_fetch_row($dbres,0);
+		} else {
+			unset($_SESSION['dbConnection']);
+		}
+	}
+	
 	$_SESSION['bayeosauth']=base64_encode($res[0].':'.$res[1]);
 	$_SESSION['from']=date('Ymd',time()-24*3600).'T00:00:00';
 	$_SESSION['until']=date('Ymd',time()+24*3600).'T00:00:00';
@@ -45,6 +56,8 @@ if($res===false) {
 		$_SESSION['max_cols']=$_COOKIE['max_cols'];
 	else
 		$_SESSION['max_cols']=5;
+	if(isset($_COOKIE['gnuplot'])) $_SESSION['gnuplot']=$_COOKIE['gnuplot'];
+	else $_SESSION['gnuplot']=0;
 	updateCookies();
 	
 	
@@ -58,6 +71,7 @@ if($res===false) {
 		$_SESSION['csv_dec']='.';
 		$_SESSION['csv_dateformat']='Y-m-d H:i:s';
 	}
+	$_SESSION['csv_tz']=$_SESSION['tz'];
 	$_SESSION['RefClasses']=array(array('mess_ziel','Target'),
 			array('mess_einheit','Unit'),
 			array('mess_geraet','Device'),

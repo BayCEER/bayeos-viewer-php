@@ -7,10 +7,12 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 0.1.15
+Version: 0.1.20
+Postinst: apache_reload
+Postrm: apache_reload
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
 # Pre-Depends: <comma-separated list of packages>
-Depends: phpexcel, libjs-jquery, libjs-jquery-ui, php5, libapache2-mod-php5, php5-xmlrpc, apache2
+Depends: gnuplot, phpexcel, libjs-jquery, libjs-jquery-ui, php5, libapache2-mod-php5, php5-xmlrpc, php5-pgsql, apache2
 # Recommends: <comma-separated list of packages>
 # Suggests: <comma-separated list of packages>
 # Provides: <comma-separated list of packages>
@@ -29,8 +31,13 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/action_login.php /usr/share/bayeos-viewer-php/
  www/action_ref.php /usr/share/bayeos-viewer-php/
  www/action_acl.php /usr/share/bayeos-viewer-php/
+ www/action_filter.php /usr/share/bayeos-viewer-php/
  www/action_object.php /usr/share/bayeos-viewer-php/
+ www/action_user.php /usr/share/bayeos-viewer-php/
  www/action_chartdata.php /usr/share/bayeos-viewer-php/
+ www/action_ipauth.php /usr/share/bayeos-viewer-php/
+ www/action_ts.php /usr/share/bayeos-viewer-php/
+ www/chart.php /usr/share/bayeos-viewer-php/
  www/constants.php /usr/share/bayeos-viewer-php/
  www/csv.php /usr/share/bayeos-viewer-php/
  www/csv_df.php /usr/share/bayeos-viewer-php/
@@ -84,6 +91,8 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/view_settings.php /usr/share/bayeos-viewer-php/
  www/view_df_editor.php /usr/share/bayeos-viewer-php/
  www/view_df_export.php /usr/share/bayeos-viewer-php/
+ www/view_ts_editor.php /usr/share/bayeos-viewer-php/
+ www/view_ts_chart.php /usr/share/bayeos-viewer-php/
  www/functions.php /usr/share/bayeos-viewer-php/
  www/index.php /usr/share/bayeos-viewer-php/
  www/css/bootstrap.icon-large.min.css /usr/share/bayeos-viewer-php/
@@ -99,7 +108,6 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/css/signin.css /usr/share/bayeos-viewer-php/
  www/css/bootstrap-theme.min.css /usr/share/bayeos-viewer-php/
  www/img/glyphicons.png /usr/share/bayeos-viewer-php/
- www/chart.php /usr/share/bayeos-viewer-php/
  xmlrpc.inc /usr/share/php/
  xmlrpcs.inc /usr/share/php/
  xmlrpc_wrappers.inc /usr/share/php/

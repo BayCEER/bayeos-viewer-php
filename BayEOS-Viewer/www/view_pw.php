@@ -3,6 +3,7 @@
 <div class="block-header">Change Password
 </div>
 <div class="row">
+<input type="hidden" name="action" value="password">
 <?php 
 echo_field("password_old",'Old Password','password','',4);
 echo_field("password",'New Password','password','',4);

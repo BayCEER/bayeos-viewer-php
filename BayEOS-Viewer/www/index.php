@@ -43,7 +43,7 @@ switch ($_SESSION['tab']){
 	case 'Change Password':
 		require 'view_pw.php';
 		break;
-	case 'User/Groups':
+	case 'User/Roles':
 		require 'view_roles.php';
 		break;
 	case 'Settings':
