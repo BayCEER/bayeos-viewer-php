@@ -4,12 +4,56 @@ $objekt=xml_call('ObjektHandler.getObjekt',
 				new xmlrpcval($node[4],'string')));
 
 if(isset($_POST['from'])){
+	switch($_POST['interval']){
+		case 'today':
+			$_POST['from']=date('y-m-d 00:00');
+			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
+			break;
+		case 'yesterday':
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24);
+			$_POST['until']=date('y-m-d 00:00');
+			break;
+		case 'this week':
+			$weekday=date('N');
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24*($weekday-1));
+			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
+			break;
+		case 'last week':
+			$weekday=date('N');
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24*($weekday+6));
+			$_POST['until']=date('y-m-d 00:00',time()-3600*24*($weekday-1));
+			break;
+		case 'this month':
+			$_POST['from']=date('y-m-01 00:00');
+			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
+			break;
+		case 'last month':
+			$last_month=date('m')-1;
+			$year=date('y');
+			if($last_month==0){
+				$last_month=12;
+				$year--;
+			}
+			$_POST['from']=$year.'-'.$last_month.'-01 00:00';
+			$_POST['until']=date('y-m-01 00:00');
+			break;
+		case 'this year':
+			$_POST['from']=date('y-01-01 00:00');
+			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
+			break;
+		case 'last year':
+			$_POST['from']=date('y-01-01 00:00',time()-365*3600*24);
+			$_POST['until']=date('y-12-31 00:00',time()-365*3600*24);
+			break;
+					
+	}
 	$from=toEpoch(toiso8601($_POST['from']));
 	$until=toEpoch(toiso8601($_POST['until']));
 } else {
 	$until=$objekt[18]->timestamp-3600;
 	$from=$objekt[17]->timestamp-3600;
 }
+
 $res=$objekt[22];
 if(! $res) $res=600;
 $max=2000;
@@ -201,10 +245,15 @@ yAxis.render();
 </script>
 <?php
 
-if($no_data) echo '<div class="alert alert-danger">At least on series returns no data. Plotting will not work.</div>';
+if($no_data) echo '<div class="alert alert-danger">Selection returns no data. Plotting will not work.</div>';
 
-echo_field("from",'From','dateTime.iso8601',date('Y-m-d h:i',$from));
-echo_field("until",'Until','dateTime.iso8601',date('Y-m-d h:i',$until));
+echo_field("from",'From','dateTime.iso8601',date('Y-m-d H:i',$from),4);
+echo_field("until",'Until','dateTime.iso8601',date('Y-m-d H:i',$until),4);
+echo_field("interval",'Interval','SelectValue',$_POST['interval'],
+			4,array('selectvalues'=>array('','today','yesterday','this week','last week','this month','last month','this year','last year')));
 
+
+$special_view_buttons=array(
+		array('Refresh','refresh',"","btn btn-primary",''));
 
 ?>

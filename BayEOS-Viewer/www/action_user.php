@@ -10,6 +10,17 @@
 if(isset($_SESSION['dbConnection'])){
 	DBQueryParams('select set_user($1)', array($_SESSION['username']));
 	
+	if(isset($_POST['authsource'])){
+		list($authsoruce,$authid)=explode('-', $_POST['authsource']);
+		if($authsoruce=='DB'){
+			$_POST['fk_auth_db']=$authid;
+			$_POST['fk_auth_ldap']=null;
+		} else {
+			$_POST['fk_auth_db']=null;
+			$_POST['fk_auth_ldap']=$authid;
+		}
+	}
+	
 	if(isset($_GET['del'])){
 		$res=DBQueryParams('select drop_user($1)', array($_GET['del']));
 		if($res)
@@ -29,8 +40,8 @@ if(isset($_SESSION['dbConnection'])){
 		elseif(strlen($_POST['user_password1'])<4)
 		add_alert('Password must have at least four characters','warning');
 		else{
-			$res=DBQueryParams('select create_user($1,$2,$3,$4,$5)', 
-					array($_POST['user_loginname'],$_POST['user_password1'],$_POST['user_fullname'],'DB','LOCAL'));
+			$res=DBQueryParams('select create_user($1,$2,$3,$4,(select name from auth_'.$authsoruce.' where id=$5))', 
+					array($_POST['user_loginname'],$_POST['user_password1'],$_POST['user_fullname'],$authsoruce,$authid));
 			if($res){
 				add_alert('User created');
 				$_GET['edit']=$_POST['user_loginname'];
@@ -57,9 +68,10 @@ if(isset($_SESSION['dbConnection'])){
 					add_alert('Password changed for user '.$_POST['edit']);
 			}
 		}
-		if($_POST['_old_locked']!=$_POST['locked'] || $_POST['_old_admin']!=$_POST['admin']){
-			$res=DBQueryParams('update benutzer set locked=$1,admin=$2 where login=$3',
-					array($_POST['locked'],$_POST['admin'],$_POST['edit']));
+		if($_POST['_old_locked']!=$_POST['locked'] || $_POST['_old_admin']!=$_POST['admin']
+				|| $_POST['_old_authsource']!=$_POST['authsource']){
+			$res=DBQueryParams('update benutzer set locked=$1,admin=$2,fk_auth_db=$3,fk_auth_ldap=$4 where login=$5',
+					array($_POST['locked'],$_POST['admin'],$_POST['fk_auth_db'],$_POST['fk_auth_ldap'],$_POST['edit']));
 			if($res)
 				add_alert('Settings changed for user '.$_POST['edit']);
 				

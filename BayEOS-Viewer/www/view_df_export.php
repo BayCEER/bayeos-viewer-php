@@ -16,4 +16,7 @@ for($i=1;$i<=12;$i++){
 echo_field("csv_tz",'Timezone','SelectValue',$_SESSION['csv_tz'],3,array('selectvalues'=>$tz));
 echo_field("csv_dateformat",'Date Format','SelectValue',$_SESSION['csv_dateformat'],3,
 		array('selectvalues'=>array('Y-m-d H:i:s','d.m.Y H:i:s')));
+
+$special_view_buttons=array(
+		array('Download CSV','download-alt',"","btn btn-primary",'name="csv_df" id="csv_submit"'));
 ?>

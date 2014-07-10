@@ -12,7 +12,7 @@ if(! $node[0]) $options['readonly']=1;
 echo '<form action="?edit='.$_GET['edit'].'&view='.$_GET['view'].'" method="POST" class="form" role="form" accept-charset="UTF-8">
 <div class="block">
 <div class="block-header">
-'.($node[5]?'Node &quot;'.$node[5].'&quot; - ID: '.$node[2]:'New Node').'
+'.($node[5]?$node[5].' - ID: '.$node[2]:'New Node').'
 </div>
 <div class="row">
 ';
@@ -171,8 +171,14 @@ echo '
 </div></div>
 <div class="block-action">';
 if(is_numeric($_GET['edit'])){
-	if($node[0]) 
+	if($node[0] && ! isset($special_view_buttons)) 
 		echo_button('Update','ok','',"btn btn-primary",'type="submit"');
+	if(isset($special_view_buttons)){
+		for($i=0;$i<count($special_view_buttons);$i++){
+			echo_button($special_view_buttons[$i][0],$special_view_buttons[$i][1],$special_view_buttons[$i][2],$special_view_buttons[$i][3],$special_view_buttons[$i][4]);
+				
+		}
+	}
 	if($node[0])
 		echo ' <button class="btn btn-default" name="_action_remove" onclick="return confirm(\'Are you sure?\');">
 	<span class="glyphicon glyphicon-trash"></span> Delete
@@ -184,10 +190,6 @@ if(is_numeric($_GET['edit'])){
 			break;
 		case 'data_column':
 			echo_button('Data Frame','edit','?view=df_editor&edit='.$node[3]);
-			break;
-		case 'data_frame':
-			if($_GET['view']=='df_export')
-				echo_button('Download CSV','download-alt',"","btn btn-primary",'name="csv_df" id="csv_submit"');
 			break;
 	}
 	

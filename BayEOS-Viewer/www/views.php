@@ -259,19 +259,29 @@ function echo_pagination($max,$current=1,$qs='',$step=10){
 	
 	$pag=array($current);
 	$current_step=1;
+	$last=$current;
 	while(($current-$current_step)>=1){
-		$pag[]=floor(($current-$current_step)/$current_step)*$current_step;
+		$new=ceil(($current-$current_step)/$current_step)*$current_step;
+		if($new!=$last){
+			$pag[]=$new;
+			$last=$new;
+		}
 		$current_step*=10;
 	}
 	$current_step=1;
+	$last=$current;
 	while(($current+$current_step)<=ceil($max/$step)){
-		$pag[]=ceil(($current+$current_step)/$current_step)*$current_step;
+		$new=floor(($current+$current_step)/$current_step)*$current_step;
+		if($new!=$last){
+			$pag[]=$new;
+			$last=$new;
+		}
 		$current_step*=10;
 	}
 	sort($pag);
 	
 	
-	echo '<li'.($current>1?'':' class="disabled"').'><a href="?page=0'.$qs.'">&laquo;</a></li>';
+	echo '<li'.($current>1?'':' class="disabled"').'><a href="?page=1'.$qs.'">&laquo;</a></li>';
 		
 	echo '<li'.($current>1?'':' class="disabled"').'><a href="?page='.($current-1).$qs.'">&lsaquo;</a></li>';
 	for($i=0;$i<count($pag);$i++){

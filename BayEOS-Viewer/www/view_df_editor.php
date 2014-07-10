@@ -1,11 +1,11 @@
 <?php 
-if(isset($_POST['offset'])) $_GET['offset']=$_POST['offset'];
-if(! isset($_GET['offset'])) $_GET['offset']=0;
+if(isset($_POST['page'])) $_GET['page']=$_POST['page'];
+if(! isset($_GET['page'])) $_GET['page']=1;
 $step=10;
-if($_GET['offset']<0) $_GET['offset']=0;
+if($_GET['page']<1) $_GET['page']=1;
 
 $nr=array();
-for($i=($_GET['offset']+1);$i<=($_GET['offset']+$step);$i++){
+for($i=($_GET['page']-1)*$step;$i<=($_GET['page']*$step);$i++){
 	$nr[]=$i;
 }
 
@@ -17,9 +17,9 @@ $xml_mapper=array('STRING'=>'string','DOUBLE'=>'double','INTEGER'=>'int','BOOLEA
 $options=array('old_hidden'=>1);
 if(! $node[0]) $options['readonly']=1;
 $max=$res[1][count($res[1])-1][0];
-echo_pagination($max+100,$_GET['offset'],"&view=df_editor&edit=$_GET[edit]",$step);
+echo_pagination($max+100,$_GET['page'],"&view=df_editor&edit=$_GET[edit]",$step);
 ?>
-<input type="hidden" name="offset" value="<?php echo $_GET['offset'];?>">
+<input type="hidden" name="page" value="<?php echo $_GET['page'];?>">
 <input type="hidden" name="action" value="df">
 <table class="table table-hover col-sm-12">
 	<thead>
@@ -43,9 +43,9 @@ echo_pagination($max+100,$_GET['offset'],"&view=df_editor&edit=$_GET[edit]",$ste
 	</thead>
 	<tbody>
 		<?php
-		$i=$_GET['offset']+1;
+		$i=($_GET['page']-1)*$step+1;
 		$ri=0;
-		while($i<=($_GET['offset']+$step)){
+		while($i<=($_GET['page']*$step)){
 			echo '<tr>
 			<td><input type="hidden" name="r[]" value="'.$i.'">'.$i.'</td>';
 			while(isset($res[1][$ri]) && $res[1][$ri][0]<$i) $ri++;

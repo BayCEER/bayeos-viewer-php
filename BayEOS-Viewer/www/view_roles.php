@@ -29,7 +29,7 @@ for($i=0;$i<count($tabs);$i++){
 <input type="hidden" name="action" value="user">
 <div class="block">
 <div class="block-header">
-<?php echo (isset($_GET['edit'])?'Change user':'New '.$name);?>
+<?php echo (isset($_GET['edit'])?'Change '.$name.' '.$_GET['edit']:'New '.$name);?>
 </div>
 <div class="row">
 <?php 
@@ -39,15 +39,35 @@ if(isset($_GET['new'])){
 } else 
 	echo '<input type="hidden" name="edit" value="'.$_GET['edit'].'">';
 if($_GET['view']==''){
-	echo_field('user_password1', 'Password', 'password');
-	echo_field('user_password2', 'Password (confirmation)', 'password');
+	echo_field('user_password1', 'Password', 'password','',4);
+	echo_field('user_password2', 'Password (confirmation)', 'password','',4);
+	$res=DBQueryParams('select id,name from auth_db order by 2', array());
+	for($i=0;$i<pg_num_rows($res);$i++){
+		$r=pg_fetch_row($res,$i);
+		$auth_source[]=array('DB-'.$r[0],'Database: '.$r[1]);
+	}
+	$res=DBQueryParams('select id,name from auth_ldap order by 2', array());
+	for($i=0;$i<pg_num_rows($res);$i++){
+		$r=pg_fetch_row($res,$i);
+		$auth_source[]=array('LDAP-'.$r[0],'LDAP: '.$r[1]);
+	}
+	
 	if(isset($_GET['edit'])){
-		$res=DBQueryParams('select case when admin then 1 end,case when locked then 1 end 
+		$res=DBQueryParams('select case when admin then 1 end,case when locked then 1 end, 
+				case when fk_auth_db is null then \'LDAP-\'||fk_auth_ldap else
+				\'DB-\'||fk_auth_db end
 				from benutzer where login=$1', array($_GET['edit']));
 		$r=pg_fetch_row($res,0);
-		echo_field('locked', 'Locked', 'boolean',$r[1],6,array('old_hidden'=>1));
-		echo_field('admin', 'Admin', 'boolean',$r[0],6,array('old_hidden'=>1));
-	} 
+	} else {
+		$r=array(0,0,'DB-1');
+	}
+	echo_field("authsource",'Password source','SelectID',$r[2],4,
+			array('selectids'=>$auth_source));
+	echo_field('locked', 'Locked', 'boolean',$r[1],6,array('old_hidden'=>1));
+	echo_field('admin', 'Admin', 'boolean',$r[0],6,array('old_hidden'=>1));
+		
+		
+	
 	
 }
 if(isset($_GET['edit'])){
@@ -107,20 +127,20 @@ if(isset($_GET['edit'])){
 	} else {
 	$qs="&view=$_GET[view]";
 	
-	
-if($res=DBQueryParams('select b.login,
+ 	if(! isset($_GET['search'])) $_GET['search']='';
+   $res=DBQueryParams('select b.login,
 			case when b.locked then \'yes\' else \'no\' end,
 			case when b.admin then \'yes\' else \'no\' end
 			from benutzer b, objekt o, art_objekt ao
-			where b.id=o.id and o.id_art=ao.id and ao.uname=$1 order by 1', 
-			array(($_GET['view']==''?'benutzer':'gruppe')))){
-
-		echo_dbtable($res, array('Name','Locked','Admin'),'user',"&view=$_GET[view]",$icon);
+			where b.id=o.id and o.id_art=ao.id and ao.uname=$1 and b.login ilike $2||\'%\' order by 1', 
+			array(($_GET['view']==''?'benutzer':'gruppe'),$_GET['search']));
+    echo '<form><input type="hidden" name="view" value="'.$_GET['view'].'">
+    <input name="search" value="'.htmlspecialchars($_GET['search']).'">
+    <input type="submit" value="search"></form>';
+	echo_dbtable($res, array('Name','Locked','Admin'),'user',"&view=$_GET[view]&search=".urlencode($_GET['search']),$icon);
 ?>
 <div class="block-action">
 <?php 	
-} else 
-	echo $GLOBALS['alert'];
 echo_button('new '.$name, 'plus','?new='.$_GET['view']);
 ?>
 </div>

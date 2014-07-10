@@ -98,8 +98,8 @@ if($_REQUEST['action']=='user')
 /***********************************************************
  * User actions
 ***********************************************************/
-if($_REQUEST['action']=='ipauth')
-	require 'action_ipauth.php';
+if($_REQUEST['action']=='auth')
+	require 'action_auth.php';
 
 
 /***********************************************************

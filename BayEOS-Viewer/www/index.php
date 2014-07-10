@@ -37,8 +37,8 @@ switch ($_SESSION['tab']){
 	case 'Chart':
 		require 'view_chart.php';
 		break;
-	case 'IP Authentication':
-		require 'view_ipauth.php';
+	case 'Authentication':
+		require 'view_auth.php';
 		break;
 	case 'Change Password':
 		require 'view_pw.php';

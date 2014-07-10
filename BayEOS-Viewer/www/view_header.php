@@ -61,11 +61,14 @@
 												'Targets'=>array('icon'=>'arrow-right'),
 												'Devices'=>array('icon'=>'hdd'),
 												'Locations'=>array('icon'=>'home'),
-												'Compartments'=>array('icon'=>'th-large'),
-												'sep2'=>1,
-												'User/Roles'=>array('icon'=>'user'),
-												'IP Authentication'=>array('icon'=>'cloud')
+												'Compartments'=>array('icon'=>'th-large')
 										)));
+						if($_SESSION['dbConnection']){
+							$nav['Admin']['dropdown']['sep2']=1;
+							$nav['Admin']['dropdown']['Authentication']=array('icon'=>'cog');
+							$nav['Admin']['dropdown']['User/Roles']=array('icon'=>'user');
+						}
+						
 						while(list($key,$value)=each($nav)){
 							if(isset($value['dropdown'])){
 								echo '

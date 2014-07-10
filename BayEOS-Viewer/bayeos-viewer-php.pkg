@@ -7,7 +7,7 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 0.1.20
+Version: 0.1.22
 Postinst: apache_reload
 Postrm: apache_reload
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
@@ -35,7 +35,7 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/action_object.php /usr/share/bayeos-viewer-php/
  www/action_user.php /usr/share/bayeos-viewer-php/
  www/action_chartdata.php /usr/share/bayeos-viewer-php/
- www/action_ipauth.php /usr/share/bayeos-viewer-php/
+ www/action_auth.php /usr/share/bayeos-viewer-php/
  www/action_ts.php /usr/share/bayeos-viewer-php/
  www/chart.php /usr/share/bayeos-viewer-php/
  www/constants.php /usr/share/bayeos-viewer-php/
@@ -83,7 +83,7 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/view_clipboard.php /usr/share/bayeos-viewer-php/
  www/view_footer.php /usr/share/bayeos-viewer-php/
  www/view_header.php /usr/share/bayeos-viewer-php/
- www/view_ipauth.php /usr/share/bayeos-viewer-php/
+ www/view_auth.php /usr/share/bayeos-viewer-php/
  www/view_login.php /usr/share/bayeos-viewer-php/
  www/view_object.php /usr/share/bayeos-viewer-php/
  www/view_pw.php /usr/share/bayeos-viewer-php/
