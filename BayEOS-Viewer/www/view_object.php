@@ -9,7 +9,8 @@ else
 $options=array('old_hidden'=>1);
 if(! $node[0]) $options['readonly']=1;
 
-echo '<form action="?edit='.$_GET['edit'].'&view='.$_GET['view'].'" method="POST" class="form" role="form" accept-charset="UTF-8">
+echo '<form action="?edit='.$_GET['edit'].'&view='.$_GET['view'].'" method="POST" class="form" 
+role="form" accept-charset="UTF-8" id="objectform">
 <div class="block">
 <div class="block-header">
 '.($node[5]?$node[5].' - ID: '.$node[2]:'New Node').'
@@ -19,9 +20,10 @@ echo '<form action="?edit='.$_GET['edit'].'&view='.$_GET['view'].'" method="POST
 if(is_numeric($_GET['edit'])){
 echo '<ul class="nav nav-tabs">
 ';
-$tabs=array(array('','edit','Details'),
-		array('ref','tags','References'),
-		array('acl','user','ACL'));
+$tabs=array(array('','edit','Details'));
+if(isset($GLOBALS['bayeos_hasref'][$node[4]]))
+	$tabs[]=array('ref','tags','References');
+$tabs[]=array('acl','user','ACL');
 if(isset($GLOBALS['bayeos_has_special_view'][$node[4]]))
 	$tabs=array_merge($tabs,$GLOBALS['bayeos_has_special_view'][$node[4]]);
 for($i=0;$i<count($tabs);$i++){
@@ -56,7 +58,8 @@ if($_GET['view']=='ref'){
 			echo '<tr>
 			<td><input type="hidden" name="refids[]" value="'.$res[$i][4].'">
 			<input type="hidden" name="refart[]" value="'.$res[$i][6].'">
-			<span class="glyphicon glyphicon-'.$GLOBALS['uname_icon_hash'][$res[$i][6]].'"></span> '.$res[$i][1].'</td>
+			<span class="glyphicon glyphicon-'.$GLOBALS['uname_icon_hash'][$res[$i][6]].'"></span> 
+			<a href="?edit='.$res[$i][5].'">'.$res[$i][1].'</a></td>
 			<td class="hidden-xs">'.get_input("von$i",'dateTime.iso8601',toDate($res[$i][2]),'',$options).'</td>
 			<td class="hidden-xs">'.get_input("bis$i",'dateTime.iso8601',toDate($res[$i][3]),'',$options).'</td>';
 			if($node[0]) echo '<td><a href="./?edit='.$_GET['edit'].'&refdel='.$res[$i][4].'&refclass='.$res[$i][6].'" class="btn btn-xs btn-default" onClick="return confirm(\'Are you sure?\');">
@@ -71,7 +74,8 @@ if($_GET['view']=='ref'){
 		if(count($res)) echo '<tr><td colspan=3>Inherited References</td></tr>';
 		for($i=0;$i<count($res);$i++){
 			echo '<tr>
-			<td><span class="glyphicon glyphicon-'.$GLOBALS['uname_icon_hash'][$res[$i][6]].'"></span> '.$res[$i][1].'</td>
+			<td>
+			<span class="glyphicon glyphicon-'.$GLOBALS['uname_icon_hash'][$res[$i][6]].'"></span> <a href="?edit='.$res[$i][5].'">'.$res[$i][1].'</a></td>
 			<td class="hidden-xs">'.toDate($res[$i][2]).'</td>
 			<td class="hidden-xs">'.toDate($res[$i][3]).'</td>
 			</tr>

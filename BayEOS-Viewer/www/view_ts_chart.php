@@ -4,49 +4,7 @@ $objekt=xml_call('ObjektHandler.getObjekt',
 				new xmlrpcval($node[4],'string')));
 
 if(isset($_POST['from'])){
-	switch($_POST['interval']){
-		case 'today':
-			$_POST['from']=date('y-m-d 00:00');
-			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
-			break;
-		case 'yesterday':
-			$_POST['from']=date('y-m-d 00:00',time()-3600*24);
-			$_POST['until']=date('y-m-d 00:00');
-			break;
-		case 'this week':
-			$weekday=date('N');
-			$_POST['from']=date('y-m-d 00:00',time()-3600*24*($weekday-1));
-			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
-			break;
-		case 'last week':
-			$weekday=date('N');
-			$_POST['from']=date('y-m-d 00:00',time()-3600*24*($weekday+6));
-			$_POST['until']=date('y-m-d 00:00',time()-3600*24*($weekday-1));
-			break;
-		case 'this month':
-			$_POST['from']=date('y-m-01 00:00');
-			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
-			break;
-		case 'last month':
-			$last_month=date('m')-1;
-			$year=date('y');
-			if($last_month==0){
-				$last_month=12;
-				$year--;
-			}
-			$_POST['from']=$year.'-'.$last_month.'-01 00:00';
-			$_POST['until']=date('y-m-01 00:00');
-			break;
-		case 'this year':
-			$_POST['from']=date('y-01-01 00:00');
-			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
-			break;
-		case 'last year':
-			$_POST['from']=date('y-01-01 00:00',time()-365*3600*24);
-			$_POST['until']=date('y-12-31 00:00',time()-365*3600*24);
-			break;
-					
-	}
+	set_post_from_until($_POST['interval']);
 	$from=toEpoch(toiso8601($_POST['from']));
 	$until=toEpoch(toiso8601($_POST['until']));
 } else {
@@ -69,16 +27,16 @@ $i=0;
 $agrint='';
 $agrfunc='';
 
+
 while(($interval/$res)>$max && $i<(count($_SESSION['AgrIntervalle'])-1)){
 	$i++;
-	$max=800;
+	$max=500;
 	$res=$_SESSION['AgrIntervalle'][$i][2];
 }
 if($i>0){
 	$agrint=$_SESSION['AgrIntervalle'][$GLOBALS['indexByID'][$i]][0];
 	$agrfunc=1;
 }
-
 ?>
 
 <script src="js/d3.min.js"></script>
@@ -145,7 +103,7 @@ echo "{ data: [";
 $val=xml_call('MassenTableHandler.getRows',
 		array(new xmlrpcval($_GET['edit'],'int'),
 				xmlrpc_array(array(toios8601FromEpoch($from),toios8601FromEpoch($until)),'dateTime.iso8601'),
-				xmlrpc_array(array(0,1,2),'int')));
+				xmlrpc_array($_SESSION['StatusFilter'],'int')));
 		$val=$val[1]->scalar;
 		$step=1;
 		if(strlen($val)>20000) $step=round(strlen($val)/20000);
@@ -247,13 +205,16 @@ yAxis.render();
 
 if($no_data) echo '<div class="alert alert-danger">Selection returns no data. Plotting will not work.</div>';
 
-echo_field("from",'From','dateTime.iso8601',date('Y-m-d H:i',$from),4);
-echo_field("until",'Until','dateTime.iso8601',date('Y-m-d H:i',$until),4);
+echo_field("from",'From','dateTime.iso8601',date('Y-m-d H:i',$from),3);
+echo_field("until",'Until','dateTime.iso8601',date('Y-m-d H:i',$until),3);
 echo_field("interval",'Interval','SelectValue',$_POST['interval'],
-			4,array('selectvalues'=>array('','today','yesterday','this week','last week','this month','last month','this year','last year')));
+			3,array('selectvalues'=>array('','today','yesterday','this week','last week','this month','last month','this year','last year')));
+echo '<div class="col-sm-3 col-lg-3"><br/>';
+echo_button('Refresh','refresh',"","btn btn-primary",'');
+echo_button('to Editor','zoom-in',"","btn btn-primary",' name="ts_to_editor"');
+echo '</div>';
 
 
-$special_view_buttons=array(
-		array('Refresh','refresh',"","btn btn-primary",''));
+$special_view_buttons=array();
 
 ?>

@@ -128,16 +128,25 @@ if(isset($_GET['edit'])){
 	$qs="&view=$_GET[view]";
 	
  	if(! isset($_GET['search'])) $_GET['search']='';
-   $res=DBQueryParams('select b.login,
+ 	if(! isset($_GET['admin'])) $_GET['admin']=0;
+ 	if(! isset($_GET['locked'])) $_GET['locked']=0;
+ 	$res=DBQueryParams('select b.login,o.de,
 			case when b.locked then \'yes\' else \'no\' end,
 			case when b.admin then \'yes\' else \'no\' end
 			from benutzer b, objekt o, art_objekt ao
-			where b.id=o.id and o.id_art=ao.id and ao.uname=$1 and b.login ilike $2||\'%\' order by 1', 
-			array(($_GET['view']==''?'benutzer':'gruppe'),$_GET['search']));
-    echo '<form><input type="hidden" name="view" value="'.$_GET['view'].'">
-    <input name="search" value="'.htmlspecialchars($_GET['search']).'">
-    <input type="submit" value="search"></form>';
-	echo_dbtable($res, array('Name','Locked','Admin'),'user',"&view=$_GET[view]&search=".urlencode($_GET['search']),$icon);
+			where b.id=o.id and o.id_art=ao.id and ao.uname=$1 and 
+ 			(b.login ilike $2||\'%\' or o.de ilike \'%\'||$2||\'%\') 
+ 			and (b.admin or not $3) and (b.locked or not $4)
+ 			order by 1', 
+			array(($_GET['view']==''?'benutzer':'gruppe'),$_GET['search'],$_GET['admin'],$_GET['locked']));
+    echo '<form><input name="search"
+		value="'.htmlspecialchars($_GET['search']).'"> 
+		<label><input type="checkbox" name="admin" '.($_GET['admin']?"checked":'').'> Admins</label>
+		<label><input type="checkbox" name="locked" '.($_GET['locked']?"checked":'').'> Locked</label>
+		<button type="submit" class="btn btn-primary">
+		<span class="glyphicon glyphicon-search"></span> Search
+	</button></form>';
+	echo_dbtable($res, array('Name','Full name','Locked','Admin'),'user',"&view=$_GET[view]&search=".urlencode($_GET['search']),$icon);
 ?>
 <div class="block-action">
 <?php 	

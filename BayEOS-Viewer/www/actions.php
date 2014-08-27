@@ -20,20 +20,13 @@ if(isset($_SESSION['tz']))
 /***********************************************************
  * Navigation
 ***********************************************************/
-
 if(isset($_GET['tab'])){
-	if(in_array($_GET['tab'],$bayeos_trees) && $_SESSION['current_tree']!=$_GET['tab']){
+	if(in_array($_GET['tab'],$bayeos_trees)){
 		$_SESSION['id']=get_root_id($bayeos_tree_unames[$_GET['tab']]);
 		$_SESSION['breadcrumbs']=array();
 		$_SESSION['breadcrumbs'][]=xml_call('TreeHandler.getNode',array(new xmlrpcval($_SESSION['id'],'int')));
 		$_SESSION['current_tree']=$_GET['tab'];
 	}
-	//Move up if user clicked on Folders comming from a node without childs 
-	$last_node=count($_SESSION['breadcrumbs'])-1;
-	if(! isset($_GET['edit']) && ! isset($_GET['id']) &&
-		! isset($bayeos_canhavechilds[$_SESSION['breadcrumbs'][$last_node][4]]))
-		$_GET['id']=$_SESSION['breadcrumbs'][$last_node][3];
-
 	$_SESSION['tab']=$_GET['tab'];
 }
 
@@ -88,6 +81,12 @@ if($_REQUEST['action']=='chartdata')
 ***********************************************************/
 if($_REQUEST['action']=='ts')
 	require 'action_ts.php';
+
+//move to editor
+if(isset($_POST['ts_to_editor']))
+	$_GET['view']='ts_editor';
+if(isset($_POST['ts_to_chart']))
+	$_GET['view']='ts_chart';
 
 /***********************************************************
  * User actions
@@ -246,6 +245,15 @@ if(isset($_GET['remove'])){
 /***********************************************************
  * Filter
  ***********************************************************/
+if(isset($_GET['interval'])){
+	set_post_from_until($_GET['interval']);
+	$_SESSION['from']=toiso8601($_POST['from']);
+	$_SESSION['until']=toiso8601($_POST['until']);
+	$_SESSION['agrint']='';
+	$_SESSION['agrfunc']='';
+	
+}
+
 if($_REQUEST['action']=='filter')
 	require 'action_filter.php';
 
@@ -266,10 +274,12 @@ if(isset($_GET['move'])){
 if(isset($_GET['treefilter'])) $_SESSION['treefilter']=$_GET['treefilter'];
 if(isset($_GET['chartmulti'])) $_SESSION['chartmulti']=$_GET['chartmulti'];
 if(isset($_GET['chartdata'])) $_SESSION['chartdata']=$_GET['chartdata'];
-if(isset($_SESSION['chartdata']) && $_SESSION['chartdata'] && count($_SESSION['clipboard'])>1){
+if(isset($_GET['interpolate'])) $_SESSION['interpolate']=$_GET['interpolate'];
+
+/*if(isset($_SESSION['chartdata']) && $_SESSION['chartdata'] && count($_SESSION['clipboard'])>1){
 	add_alert('Time series show data only works with <b>ONE</b> selected series!','warning');
 	$_SESSION['chartdata']=0;
-}
+}*/
 
 
 ?>

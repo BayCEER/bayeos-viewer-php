@@ -16,8 +16,12 @@ $input_mapper=array('STRING'=>'string','DOUBLE'=>'string','INTEGER'=>'string','B
 $xml_mapper=array('STRING'=>'string','DOUBLE'=>'double','INTEGER'=>'int','BOOLEAN'=>'boolean','DATE'=>'dateTime.iso8601');
 $options=array('old_hidden'=>1);
 if(! $node[0]) $options['readonly']=1;
-$max=$res[1][count($res[1])-1][0];
-echo_pagination($max+100,$_GET['page'],"&view=df_editor&edit=$_GET[edit]",$step);
+$colids=array();
+for($i=0;$i<count($res[0]);$i++){
+	$colids[]=$res[0][$i][0];
+}
+$max=xml_call('DataFrameHandler.getMaxRowIndex',array(xmlrpc_array($colids,'int')));
+echo_pagination($max+15,$_GET['page'],"&view=df_editor&edit=$_GET[edit]",$step);
 ?>
 <input type="hidden" name="page" value="<?php echo $_GET['page'];?>">
 <input type="hidden" name="action" value="df">

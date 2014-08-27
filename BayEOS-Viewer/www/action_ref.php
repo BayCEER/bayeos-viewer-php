@@ -8,12 +8,26 @@ if(isset($_GET['refdel'])){
 }
 //Create new reference node:
 if($_REQUEST['action']=='ref' && ! $_POST['newref'] && $_POST['newref_dp']){
-	if($node=xml_call('TreeHandler.newNode',array(new xmlrpcval($_POST['refclass'],'string'),
+	$res=xml_call('TreeHandler.getAllChildren',
+			array(new xmlrpcval(get_root_id($_POST['refclass']),'int'),
+					new xmlrpcval(false,'boolean'),
+					xmlrpc_array(array('mitarbeiter','projekte')),
+					new xmlrpcval('**/'.$_POST['newref_dp'],'string'),
+					new xmlrpcval($_POST['refclass'],'string'),
+					new xmlrpcval(-1,'int'),
+					new xmlrpcval(FALSE,'boolean'),
+					new xmlrpcval('week','string'),
+					new xmlrpcval(null,'null')
+			));
+	if(! count($res)){
+		if($node=xml_call('TreeHandler.newNode',array(new xmlrpcval($_POST['refclass'],'string'),
 			new xmlrpcval($_POST['newref_dp'],'string'),
 			new xmlrpcval(get_root_id($_POST['refclass']),'int')))){
-		$_POST['newref']=$node[2];
-		add_alert('New node created');
-	}
+			$_POST['newref']=$node[2];
+			add_alert('New node created');
+		}
+	} else 
+		$_POST['newref']=$res[0][0];
 }
 //Create new reference:
 if(isset($_POST['newref']) && is_numeric($_POST['newref'])){

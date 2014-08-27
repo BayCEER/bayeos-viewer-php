@@ -82,7 +82,8 @@ if(isset($_SESSION['dbConnection'])){
 		$res=DBQueryParams('select id,network,login,access from auth_ip order by network,login',array());
 		echo_dbtable($res, array('ID','Network','Login','Access'),'auth','&view='.$_GET['view']);
 	} else {
-		$res=DBQueryParams('select id,name,host,dn,ssl,port from auth_ldap order by name',array());
+		$res=DBQueryParams('select id,name,host,dn,case when ssl then \'yes\' else \'no\' end,
+				port from auth_ldap order by name',array());
 		echo_dbtable($res, array('ID','Name','Host','DN','SSL','Port'),'auth','&view='.$_GET['view']);
 	}
 	?>

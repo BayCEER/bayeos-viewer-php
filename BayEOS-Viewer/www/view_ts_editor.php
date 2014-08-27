@@ -7,18 +7,73 @@ $objekt=xml_call('ObjektHandler.getObjekt',
 		array(new xmlrpcval($_GET['edit'],'int'),
 				new xmlrpcval($node[4],'string')));
 $step=10;
-$max=$objekt[18]->timestamp-3600;
-$min=$objekt[17]->timestamp-3600;
 
-$from=$min+($_GET['page']-1)*$step*$objekt[22];
+if(isset($_POST['from'])){
+	set_post_from_until($_POST['interval']);
+	$min_ts=toEpoch(toiso8601($_POST['from']));	
+	$max_ts=toEpoch(toiso8601($_POST['until']));
+} elseif(isset($_GET['min_ts'])){
+	$min_ts=$_GET['min_ts'];
+	$max_ts=$_GET['max_ts'];	
+} else {
+	$max_ts=$objekt[18]->timestamp-3600;
+	$min_ts=$objekt[17]->timestamp-3600;
+}
+$from=$min_ts+($_GET['page']-1)*$step*$objekt[22];
 $until=$from+$step*$objekt[22];
 
 
-$max=round(($max-$min)/$objekt[22]);
+$max=round(($max_ts-$min_ts)/$objekt[22]);
+?> 
 
+<script>
+function addLeadingZeros(number, length) {
+    var num = '' + number;
+    while (num.length < length) num = '0' + num;
+    return num;
+}
+function format_date(d){
+	var s=d.getFullYear()+'-'+addLeadingZeros(d.getMonth()+1,2)+'-'+addLeadingZeros(d.getDate(),2)+' '+d.toLocaleTimeString();
+	return s;
+}
 
+function set_from_until(from,until){
+	if(from!=null)
+		$('#from').val(format_date(new Date(from*1000)));
+	if(until!=null)
+		$('#until').val(format_date(new Date(until*1000)));
+	
+}
 
-echo_pagination($max,$_GET['page'],"&view=ts_editor&edit=$_GET[edit]");
+$(function() {
+$( "#slider-range" ).slider({
+range: true,
+min: <?php echo $min_ts;?>,
+max: <?php echo $max_ts;?>,
+values: [ <?php echo $min_ts;?>, <?php echo $max_ts;?> ],
+slide: function( event, ui ) {
+	set_from_until(ui.values[0],ui.values[1]);
+}
+
+});
+});
+</script>
+<br/>
+<div id="slider-range"></div>
+<div class="row">
+<?php 
+echo_field("from",'From','dateTime.iso8601',date('Y-m-d H:i',$min_ts),3);
+echo_field("until",'Until','dateTime.iso8601',date('Y-m-d H:i',$max_ts),3);
+echo_field("interval",'Interval','SelectValue',$_POST['interval'],
+			3,array('selectvalues'=>array('','today','yesterday','this week','last week','this month','last month','this year','last year')));
+echo '<div class="col-sm-3 col-lg-3"><br/>';
+echo_button('Refresh','refresh',"","btn btn-primary",'');
+echo_button('to Chart','signal',"","btn btn-primary",' name="ts_to_chart"');
+echo '</div>';
+?>
+</div>
+<?php 
+echo_pagination($max,$_GET['page'],"&view=ts_editor&edit=$_GET[edit]&min_ts=$min_ts&max_ts=$max_ts");
 
 $val=xml_call('MassenTableHandler.getRows',
 		array(new xmlrpcval($_GET['edit'],'int'),
@@ -72,8 +127,6 @@ if($node[0]){
 
 echo '</tbody>
 </table>';
-
-
 
 
 ?>

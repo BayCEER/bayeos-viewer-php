@@ -26,7 +26,7 @@ for($i=0;$i<count($_SESSION['AgrIntervalle']);$i++){
 	$resByID[$_SESSION['AgrIntervalle'][$i][0]]=$_SESSION['AgrIntervalle'][$i][2];
 	$indexByID[$_SESSION['AgrIntervalle'][$i][0]]=$i;
 }
-function checkres($interval,$res){
+function checkres($interval,$res,$alert=1){
 	$i=0;
 	if(! $res) $res=600;
 	$max=$_SESSION['max_rows'];
@@ -43,7 +43,8 @@ function checkres($interval,$res){
 	if($i>$_SESSION['agrint']){
 		$_SESSION['agrint']=$_SESSION['AgrIntervalle'][$GLOBALS['indexByID'][$i]][0];
 		$_SESSION['agrfunc']=1;
-		echo '<div class="alert alert-warning">Estimated rows exceeds '.$_SESSION['max_rows'].' set as maximum
+		if($alert) 
+			echo '<div class="alert alert-warning">Estimated rows exceeds '.$_SESSION['max_rows'].' set as maximum
 		in <a href="?tab=Settings" class="alert-link">settings</a>.
 		Switched to '.$_SESSION['AgrIntervalle'][$GLOBALS['indexByID'][$i]][1].' + Avg</div>';
 	}
@@ -51,6 +52,8 @@ function checkres($interval,$res){
 
 $pathinfo=get_folder_subfolders();
 
+$ids=array();
+$names=array();
 for($i=0;$i<$max_i;$i++){
 	if(isset($pathinfo['subfolders']))
 		$_SESSION['clipboard'][$i]['subfolder']=$pathinfo['subfolders'][$i].'/';
@@ -60,7 +63,9 @@ for($i=0;$i<$max_i;$i++){
 		$series[$i]=array($_SESSION['clipboard'][$i]);
 	else 
 		$series[0][$i]=$_SESSION['clipboard'][$i];
-	checkres($sec,$_SESSION['clipboard'][$i]['res']);
+	$ids[$i]=$_SESSION['clipboard'][$i][2];
+	$names[$i]=$_SESSION['clipboard'][$i][5];
+	checkres($sec,$_SESSION['clipboard'][$i]['res'],!isset($_GET['interval']));
 }
 
 
@@ -82,7 +87,9 @@ if($_SESSION['chartmulti']){
 document.write('<img src="chart.php?x='+width+'">');
 <?php }?>
 </script>
-<?php } else { ?>
+<?php } 
+else 
+{ ?>
 
 <script src="js/d3.min.js"></script>
 <script src="js/rickshaw.min.js"></script>
@@ -138,15 +145,26 @@ var palette = new Rickshaw.Color.Palette( { scheme: 'colorwheel' } );
 
 </script>
 <?php 
+$timefilter=xmlrpc_array(array($_SESSION['from'],$_SESSION['until']),'dateTime.iso8601');
+if(! $_SESSION['agrfunc'] || ! $_SESSION['agrint'])	$filter_arg=xmlrpc_array($_SESSION['StatusFilter'],'int');
+else $filter_arg=xmlrpc_array(array($_SESSION['agrfunc'],$_SESSION['agrint']),'int');
+
+$data=getSeries($ids, $_SESSION['agrfunc'], $_SESSION['agrint'], $timefilter, $filter_arg);
+if(! isset($data['datetime'])) $no_data=1;
+
 for($p=0;$p<count($series);$p++){
 ?>
-	<div id="chart_container">
-        <div id="y_axis<?php echo $p;?>"></div>
+<div class="row">
+<div class="col-md-9">
+      <div id="y_axis<?php echo $p;?>"></div>
 		<div id="chart<?php echo $p;?>"></div>
-		<div id="legend<?php echo $p;?>"></div>
 		<div id="timeline<?php echo $p;?>"></div>
 		<div id="preview<?php echo $p;?>"></div>
-		</div>	
+</div>	
+<div class="col-md-3">
+ 		<div id="legend<?php echo $p;?>"></div>
+</div>
+</div>
 <script>
 <?php 
 if(! $readonly){ //set the onClick handler of the chart
@@ -171,7 +189,7 @@ if($_SESSION['chartdata']){
 	$s=array();
 }
 $unit=array();
-$no_data=0;
+
 for($i=0;$i<count($series[$p]);$i++){	
 	$res=xml_call('ObjektHandler.getLowestRefObjekt',
 			array(new xmlrpcval($series[$p][$i][2],'int'),
@@ -179,49 +197,19 @@ for($i=0;$i<count($series[$p]);$i++){
 	$unit[$i]=$res[20];
 	
 	if($i>0) echo ", ";
+	$comma=0;
 	echo "{ data: [";
-	if(! $_SESSION['agrfunc'] || ! $_SESSION['agrint']){
-		$val=xml_call('MassenTableHandler.getRows',
-				array(new xmlrpcval($series[$p][$i][2],'int'),
-						new xmlrpcval(array(new xmlrpcval($_SESSION['from'],'dateTime.iso8601'),
-								new xmlrpcval($_SESSION['until'],'dateTime.iso8601')),'array'),
-						new xmlrpcval(array(new xmlrpcval(0,'int'),new xmlrpcval(1,'int'),new xmlrpcval(2,'int')),'array'
-						)));
-		$val=$val[1]->scalar;
-		$step=1;
-		if(strlen($val)>20000 && ! $_SESSION['chartdata']) $step=round(strlen($val)/20000);
-		$pos=0;
-		if(strlen($val)==0) $no_data=1;
-		while($pos<strlen($val)){
-			if($pos>0) echo ",\n";
-			$tmp=unpack('N',substr($val,$pos,4));
-			echo "{x:$tmp[1],";
-			$tmp2=unpack('N',substr($val,$pos+4,4));
-			$t=pack('L',$tmp2[1]);
-			$tmp2=unpack('f',$t);
-			echo "y:".round($tmp2[1],5)."}";
-			if($_SESSION['chartdata']){
-				$x[]=$tmp[1];
-				$y[]=$tmp2[1];
-				$tmp2=unpack('c',substr($val,$pos+8,1));
-				$s[]=$tmp2[1];
-			}
-			$pos+=9*$step;
+	for($j=0;$j<count($data['datetime']);$j++){
+		if($comma) echo ",\n";
+		if(! $_SESSION['interpolate'] && $j>1 && ($data['datetime'][$j]-$data['datetime'][$j-1])>=
+				2*($data['datetime'][$j-1]-$data['datetime'][$j-2])){
+			echo "{x:".($data['datetime'][$j-1]+($data['datetime'][$j]-$data['datetime'][$j-1])).",y:null},\n";
+			$comma=0;
 		}
-	} else {
-		$val=xml_call('AggregationTableHandler.getRows',
-				array(new xmlrpcval($series[$p][$i][2],'int'),
-						new xmlrpcval(array(new xmlrpcval($_SESSION['from'],'dateTime.iso8601'),
-								new xmlrpcval($_SESSION['until'],'dateTime.iso8601')),'array'),
-						new xmlrpcval(array(new xmlrpcval($_SESSION['agrfunc'],'int'),new xmlrpcval($_SESSION['agrint'],'int')),'array'
-						)));
-		$val=$val[1];
-		$step=1;
-		if(count($val)==0) $no_data=1;
-		if(count($val)>2000) $step=round(count($val)/2000);
-		for($j=0;$j<count($val);$j+=$step){
-			if($j>0) echo ",";
-			echo "{x:".($val[$j][0]->timestamp-3600).",y:".round($val[$j][1],5)."}\n";
+		if(! $_SESSION['interpolate'] || ! is_nan($data[($i+$p)][$j])){
+			echo "{x:".$data['datetime'][$j].
+		",y:".(is_nan($data[($i+$p)][$j])?'null':round($data[($i+$p)][$j],5))."}";
+			$comma=1;
 		}
 	}
 	echo "],
@@ -303,8 +291,10 @@ if($no_data) echo '<div class="alert alert-danger">At least on series returns no
 } // clipboard empty!
 //Actionblock for zoom, move + data
 echo '
-<div class="block-action dropdown">';
+<div class="btn-group">'; //block-action dropdown
 echo_saved_cb_dropdown();
+echo '
+	</div>';
 if($max_i){
 echo_button('back','arrow-left',"?move=-1");
 echo_button('forward','arrow-right',"?move=+1");
@@ -314,13 +304,23 @@ if(count($_SESSION['clipboard'])>1){
 	if($_SESSION['chartmulti']) echo_button('Single Plot','resize-small',"?chartmulti=0");
 	else echo_button('Multiple Plots','resize-full',"?chartmulti=1");
 }
-if(($_SESSION['agrfunc']=='' || $_SESSION['agrint']=='') && ! $_SESSION['gnuplot']){
+if(! $_SESSION['gnuplot']){
 	if($_SESSION['chartdata']) echo_button('Hide Data','arrow-up',"?chartdata=0");
 	else echo_button('Show Data','arrow-down',"?chartdata=1");
+	if($_SESSION['interpolate']) echo_button('Show gaps','pause',"?interpolate=0");
+	else echo_button('Interpolate','minus',"?interpolate=1");
 }
+echo '<div class="btn-group">
+<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" >
+<span class="glyphicon glyphicon-resize-horizontal"></span> Interval <span class="caret"></span></button>
+		 <ul class="dropdown-menu" role="menu">';
+$interval=array('today','yesterday','this week','last week','this month','last month','this year','last year');
+for($i=0;$i<count($interval);$i++){
+	echo '<li><a href="?interval='.urlencode($interval[$i]).'">'.htmlspecialchars($interval[$i]).'</a></li>';
 }
-echo '
-	</div>';
+echo '</ul></div>';
+
+}
 
 if($max_i){
 //Datablock
@@ -337,9 +337,12 @@ if($_SESSION['chartdata']){
 	<table class="table table-hover col-sm-12" id="domainTable">
 		<thead>
 		<tr>
-		<th>Time</th>
-		<th>Value</th>
-		<th>Status</th>
+		<th>Time</th>';
+	for($j=0;$j<count($names);$j++){
+		echo "<th>$names[$j]</th>";
+	}
+	if(count($ids)==1) echo '<th>Status</th>';
+	echo '
 		'.($readonly?'':'<th>
          <!-- Added ID to below select box -->
          <input type="checkbox" name="selectAll" id="selectAllDomainList" />
@@ -348,10 +351,14 @@ if($_SESSION['chartdata']){
 		</thead>
 		<tbody>
 	';
-	for($i=0;$i<count($x);$i++){
+	for($i=0;$i<count($data['datetime']);$i++){
 		echo '<tr><td>'
-		.date('Y-m-d H:i:s',$x[$i]).'</td><td>'.$y[$i].'</td><td>'.$status[$s[$i]].'</td>'.
-		($readonly?'':'<td><input type="checkbox" id="cb'.$x[$i].'" value="'.$x[$i].'" name="ts[]"></td>').'
+		.date('Y-m-d H:i:s',$data['datetime'][$i]).'</td>';
+		for($j=0;$j<count($ids);$j++){
+			echo '<td>'.round($data[$j][$i],4).'</td>';
+		}
+		if(count($ids)==1) echo '<td>'.$status[$data['status'][$i]].'</td>';
+		echo ($readonly?'':'<td><input type="checkbox" id="cb'.$data['datetime'][$i].'" value="'.$data['datetime'][$i].'" name="ts[]"></td>').'
 		</tr>';
 	}
 	echo '</tbody></table>

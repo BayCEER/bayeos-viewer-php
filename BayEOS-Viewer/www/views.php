@@ -256,27 +256,48 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 function echo_pagination($max,$current=1,$qs='',$step=10){
 	if($max<=$step) return;
 	echo '<ul class="pagination">';
+	if($current<1) $current=1;
+	if($current>ceil($max/$step)) $current=ceil($max/$step);
 	
 	$pag=array($current);
 	$current_step=1;
 	$last=$current;
+	$pag_count=0;
 	while(($current-$current_step)>=1){
-		$new=ceil(($current-$current_step)/$current_step)*$current_step;
+		$pag_count++;
+		if($max/$step>12 || $pag_count>2){
+			$new=ceil(($current-$current_step)/$current_step)*$current_step;
+			$current_step*=10;
+		} else {
+			$new=round($current-$current_step);
+			$current_step++;
+			if($pag_count>1)
+				$current_step=10;
+		}
 		if($new!=$last){
 			$pag[]=$new;
 			$last=$new;
 		}
-		$current_step*=10;
+		
 	}
 	$current_step=1;
 	$last=$current;
+	$pag_count=0;
 	while(($current+$current_step)<=ceil($max/$step)){
-		$new=floor(($current+$current_step)/$current_step)*$current_step;
+		$pag_count++;
+		if($max/$step>12 || $pag_count>2){
+			$new=floor(($current+$current_step)/$current_step)*$current_step;
+			$current_step*=10;
+		} else {
+			$new=round($current+$current_step);
+			$current_step++;
+			if($pag_count>1)
+				$current_step=10;
+		}
 		if($new!=$last){
 			$pag[]=$new;
 			$last=$new;
 		}
-		$current_step*=10;
 	}
 	sort($pag);
 	
@@ -292,7 +313,7 @@ function echo_pagination($max,$current=1,$qs='',$step=10){
 	echo '</ul>';
 }
 
-function echo_table($childs,$action="add"){
+function echo_table($childs,$action="add",$qs=''){
 	$with_path=isset($childs[0]['path']);
 	?>	
 	</div><div class="container">
@@ -329,11 +350,11 @@ function echo_table($childs,$action="add"){
 			if($childs[$i][4]=='messung_massendaten' || $childs[$i][4]=='messung_ordner'){
 			switch($action){
 				case 'add':
-					echo '<a href="./?add='.$childs[$i][2].'" class="btn btn-xs btn-default">
+					echo '<a href="./?add='.$childs[$i][2].$qs.'" class="btn btn-xs btn-default">
 	         		<span class="glyphicon glyphicon-pushpin"></span> <span class="hidden-xs">To Clipboard</span></a>';
 					break;
 				case 'remove':
-					echo '<a href="./?remove='.$childs[$i][2].'" class="btn btn-xs btn-default">
+					echo '<a href="./?remove='.$childs[$i][2].$qs.'" class="btn btn-xs btn-default">
 					<span class="glyphicon glyphicon-remove"></span> <span class="hidden-xs">Remove</span></a>';
 					break;
 						

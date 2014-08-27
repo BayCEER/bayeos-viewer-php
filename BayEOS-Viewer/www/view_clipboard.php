@@ -2,7 +2,7 @@
 $clipboard=count($_SESSION['clipboard']);
 if(! $clipboard){
 	echo '<div class="alert alert-warning">Your clipboard is empty.</div>
-	<div class="block-action dropdown">';
+	<div class="btn-group">';
 	echo_saved_cb_dropdown();
 	echo '</div>';
 }
@@ -15,14 +15,14 @@ else {
 <div class="row">
 <input type="hidden" name="action" value="settings_clipboard">
 <div class="col-sm-12"><div class="form-group ">
-<div class="dropdown">
+<div class="btn-group">
 <?php echo_saved_cb_dropdown(); ?>
+</div>
 <input name="save_as">
 <button class="btn btn-primary" type="submit">
 <span class="glyphicon glyphicon-ok"></span> Save</button> 
 Note: Settings will get stored in cookies. 
 If you did not enable cookies settings will only be valid until logout.
-</div>
 </div>
 </div>
 </div>

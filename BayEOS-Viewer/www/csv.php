@@ -55,7 +55,7 @@ for($i=0;$i<count($_SESSION['clipboard']);$i++){
 $cols=count($ids);
 $out.="\n$head\n";					  
 $timefilter=xmlrpc_array(array($_SESSION['csv_from'],$_SESSION['csv_until']),'dateTime.iso8601');
-if(! $_SESSION['csv_agrfunc'] || ! $_SESSION['csv_agrint'])	$filter_arg=xmlrpc_array(array(0,1,2),'int');
+if(! $_SESSION['csv_agrfunc'] || ! $_SESSION['csv_agrint'])	$filter_arg=xmlrpc_array($_SESSION['StatusFilter'],'int');
 else $filter_arg=xmlrpc_array(array($_SESSION['csv_agrfunc'],$_SESSION['csv_agrint']),'int');
 	
 

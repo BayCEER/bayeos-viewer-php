@@ -10,6 +10,7 @@
 </form>
 <?php 	
 if(isset($_GET['search']) && $_GET['search']){
+	$qs='&search='.urlencode($_GET['search']).'&subtreesearch='.$_GET['subtreesearch'];
 	if($_SESSION['current_tree']=='Folders') $art_filter='messung_%';
 	else $art_filter=$GLOBALS['bayeos_tree_unames'][$_SESSION['current_tree']];
 	$search=xml_call('TreeHandler.getAllChildren',
@@ -32,6 +33,7 @@ if(isset($_GET['search']) && $_GET['search']){
 	}
 
 } else {
+	$qs='';
 	$childs=xml_call('TreeHandler.getChilds',
 			array(new xmlrpcval($_SESSION['id'],'int'),
 					new xmlrpcval('messung_massendaten','string'),
@@ -42,7 +44,7 @@ if(isset($_GET['search']) && $_GET['search']){
 							new xmlrpcval(null,'null'))
 			));
 }
-echo_table($childs);
+echo_table($childs,'add',$qs);
 //print_r($_SESSION);
 echo '
     <div class="dropdown">

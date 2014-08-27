@@ -12,6 +12,53 @@ function add_alert($text,$type='success',$dismissable=TRUE){
 	$text.'</div>';
 }
 
+function set_post_from_until($interval){
+	switch($interval){
+		case 'today':
+			$_POST['from']=date('y-m-d 00:00');
+			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
+			break;
+		case 'yesterday':
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24);
+			$_POST['until']=date('y-m-d 00:00');
+			break;
+		case 'this week':
+			$weekday=date('N');
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24*($weekday-1));
+			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
+			break;
+		case 'last week':
+			$weekday=date('N');
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24*($weekday+6));
+			$_POST['until']=date('y-m-d 00:00',time()-3600*24*($weekday-1));
+			break;
+		case 'this month':
+			$_POST['from']=date('y-m-01 00:00');
+			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
+			break;
+		case 'last month':
+			$last_month=date('m')-1;
+			$year=date('y');
+			if($last_month==0){
+				$last_month=12;
+				$year--;
+			}
+			$_POST['from']=$year.'-'.$last_month.'-01 00:00';
+			$_POST['until']=date('y-m-01 00:00');
+			break;
+		case 'this year':
+			$_POST['from']=date('y-01-01 00:00');
+			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
+			break;
+		case 'last year':
+			$_POST['from']=date('y-01-01 00:00',time()-365*3600*24);
+			$_POST['until']=date('y-12-31 00:00',time()-365*3600*24);
+			break;
+				
+	}
+	
+}
+
 function DBQueryParams($query,$params){
 	if(! $GLOBALS['conn'])
 		$GLOBALS['conn']=pg_connect($_SESSION['dbConnection']);
@@ -277,6 +324,73 @@ function addToClipboard($node,$alert=1){
 			return 1;
 	}
 	return 0;
+}
+
+function getSeries($ids,$aggfunc,$aggint,$timefilter,$filter_arg){
+	$res=array();
+	if(count($ids)==1){
+		if(! $aggfunc || !$aggint){
+			$val=xml_call('MassenTableHandler.getRows',
+					array(new xmlrpcval($_SESSION['clipboard'][0][2],'int'),
+							$timefilter,
+							$filter_arg));
+			$val=$val[1]->scalar;
+			$pos=0;
+			$i=0;
+			while($pos<strlen($val)){
+				$tmp=unpack('N',substr($val,$pos,4));
+				$res['datetime'][$i]=$tmp[1];
+				$tmp=unpack('N',substr($val,$pos+4,4));
+				$t=pack('L',$tmp[1]);
+				$tmp=unpack('f',$t);
+				$res[0][$i]=$tmp[1];				
+				$tmp=unpack('c',substr($val,$pos+8,1));
+				$res['status'][$i]=$tmp[1];
+				$pos+=9;
+				$i++;
+			}
+		} else {
+			$val=xml_call('AggregationTableHandler.getRows',
+					array(new xmlrpcval($_SESSION['clipboard'][0][2],'int'),
+							$timefilter,
+							$filter_arg));
+			$val=$val[1];
+			for($j=0;$j<count($val);$j++){
+				$res['datetime'][$j]=$val[$j][0]->timestamp-3600;
+				$res[0][$j]=$val[$j][1];
+			}
+		}
+	} else {
+		if(!$aggfunc || !$aggint){
+			$func='MassenTableHandler.getMatrix';
+		}
+		else {
+			$func='AggregationTableHandler.getMatrix';
+		}
+		$val=xml_call($func,
+				array(xmlrpc_array($ids,'int'),
+						$timefilter,
+						$filter_arg,
+						new xmlrpcval(false,'boolean')));
+		$val=$val[1]->scalar;
+		$pos=0;
+		$i=0;
+		$cols=count($ids);
+		while($pos<strlen($val)){
+			$tmp=unpack('N',substr($val,$pos,4));
+			$pos+=4;
+			$res['datetime'][$i]=$tmp[1];
+			for($j=0;$j<$cols;$j++){
+				$tmp=unpack('N',substr($val,$pos,4));
+				$t=pack('L',$tmp[1]);
+				$tmp=unpack('f',$t);
+				$res[$j][$i]=$tmp[1];
+				$pos+=4;
+			}
+			$i++;
+		}
+	}
+	return $res;
 }
 
 ?>

@@ -62,7 +62,7 @@ if(isset($_SESSION['dbConnection'])){
 			elseif(strlen($_POST['user_password1'])<4)
 			add_alert('Password must have at least four characters','warning');
 			else{
-				$res=DBQueryParams('select set_password($1,$2)',
+				$res=DBQueryParams('select set_passwd($1::text,$2::text)',
 						array($_POST['edit'],$_POST['user_password1']));
 				if($res)
 					add_alert('Password changed for user '.$_POST['edit']);
@@ -70,6 +70,9 @@ if(isset($_SESSION['dbConnection'])){
 		}
 		if($_POST['_old_locked']!=$_POST['locked'] || $_POST['_old_admin']!=$_POST['admin']
 				|| $_POST['_old_authsource']!=$_POST['authsource']){
+			if(! $_POST['locked']) $_POST['locked']=0;
+			if(! $_POST['admin']) $_POST['admin']=0;
+				
 			$res=DBQueryParams('update benutzer set locked=$1,admin=$2,fk_auth_db=$3,fk_auth_ldap=$4 where login=$5',
 					array($_POST['locked'],$_POST['admin'],$_POST['fk_auth_db'],$_POST['fk_auth_ldap'],$_POST['edit']));
 			if($res)
