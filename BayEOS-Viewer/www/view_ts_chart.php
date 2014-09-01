@@ -97,43 +97,24 @@ $res=xml_call('ObjektHandler.getLowestRefObjekt',
 		array(new xmlrpcval($_GET['edit'],'int'),
 				new xmlrpcval('mess_einheit','string')));
 $unit[$i]=$res[20];
-	
+if(! $agrfunc || ! $agrint)	$filter_arg=xmlrpc_array($_SESSION['StatusFilter'],'int');
+else $filter_arg=xmlrpc_array(array($agrfunc,$agrint),'int');
+$data=getSeries(array($_GET['edit']), $agrfunc, $agrint, 
+		xmlrpc_array(array(toios8601FromEpoch($from),toios8601FromEpoch($until)),'dateTime.iso8601'),
+		$filter_arg);
 echo "{ data: [";
-	if(! $agrfunc || ! $agrint){
-$val=xml_call('MassenTableHandler.getRows',
-		array(new xmlrpcval($_GET['edit'],'int'),
-				xmlrpc_array(array(toios8601FromEpoch($from),toios8601FromEpoch($until)),'dateTime.iso8601'),
-				xmlrpc_array($_SESSION['StatusFilter'],'int')));
-		$val=$val[1]->scalar;
-		$step=1;
-		if(strlen($val)>20000) $step=round(strlen($val)/20000);
-		$pos=0;
-		if(strlen($val)==0) $no_data=1;
-		while($pos<strlen($val)){
-			if($pos>0) echo ",\n";
-			$tmp=unpack('N',substr($val,$pos,4));
-			echo "{x:$tmp[1],";
-			$tmp2=unpack('N',substr($val,$pos+4,4));
-			$t=pack('L',$tmp2[1]);
-			$tmp2=unpack('f',$t);
-			echo "y:".round($tmp2[1],5)."}";
-			$pos+=9*$step;
-		}
-	} else {
-		$val=xml_call('AggregationTableHandler.getRows',
-				array(new xmlrpcval($_GET['edit'],'int'),
-				xmlrpc_array(array(toios8601FromEpoch($from),toios8601FromEpoch($until)),'dateTime.iso8601'),
-				new xmlrpcval(array(new xmlrpcval($agrfunc,'int'),new xmlrpcval($agrint,'int')),'array'
-						)));
-		$val=$val[1];
-		$step=1;
-		if(count($val)==0) $no_data=1;
-		if(count($val)>2000) $step=round(count($val)/2000);
-		for($j=0;$j<count($val);$j+=$step){
-			if($j>0) echo ",";
-			echo "{x:".($val[$j][0]->timestamp-3600).",y:".round($val[$j][1],5)."}\n";
-		}
+$comma=0;
+for($j=0;$j<count($data['datetime']);$j++){
+	if($comma) echo ",\n";
+	if($j>1 && ($data['datetime'][$j]-$data['datetime'][$j-1])>=
+			2*($data['datetime'][$j-1]-$data['datetime'][$j-2])){
+		echo "{x:".($data['datetime'][$j-1]+($data['datetime'][$j]-$data['datetime'][$j-1])).",y:null},\n";
 	}
+	echo "{x:".$data['datetime'][$j].",y:".round($data[0][$j],5)."}";
+	$comma=1;
+}
+
+
 	echo "],
 	color: palette.color(),
     name: '".$objekt[20].' <b>'.$series[$p][$i][5].'</b>'.($unit[$i]?" [$unit[$i]]":'')."'}";

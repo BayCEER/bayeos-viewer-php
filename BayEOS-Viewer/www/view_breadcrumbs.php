@@ -1,4 +1,13 @@
 <?php 
+//ID-Search via User-Input
+if(isset($_GET['search']) && is_numeric($_GET['search']) && $_GET['stype']==2){
+	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['search'],'int')));
+	if($node){
+		if($node['4']=='messung_massendaten') $_GET['edit']=$node[2];
+		else $_GET['id']=$node[2];
+	}
+}
+
 if(isset($_GET['edit']) && is_numeric($_GET['edit'])) $_GET['id']=$_GET['edit'];
 if(isset($_GET['id']) && is_numeric($_GET['id']))	$_SESSION['id']=$_GET['id'];
 $i=0;

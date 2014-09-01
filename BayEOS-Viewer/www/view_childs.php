@@ -1,16 +1,19 @@
 <?php if(! isset($_GET['search'])) $_GET['search']='';?>
 <form accept-charset="UTF-8">
 	<input name="search"
-		value="<?php echo htmlentities($_GET['search']);?>"> <label><input
-		type="checkbox" name="subtreesearch"
-		<?php if(isset($_GET['subtreesearch']) && $_GET['subtreesearch']) echo "checked"?>> include subfolders</label>
+		value="<?php echo htmlentities($_GET['search']);?>"> IN 
+	<select name="stype">
+	<option value="0">folder</option>
+	<option value="1"<?php if($_GET['stype']==1) echo " selected";?>>subfolders</option>
+	<option value="2"<?php if($_GET['stype']==2) echo " selected";?>>ID</option>
+	</select>
 	<button type="submit" class="btn btn-primary">
 		<span class="glyphicon glyphicon-search"></span> Search
 	</button>
 </form>
 <?php 	
-if(isset($_GET['search']) && $_GET['search']){
-	$qs='&search='.urlencode($_GET['search']).'&subtreesearch='.$_GET['subtreesearch'];
+if(isset($_GET['search']) && $_GET['search'] && $_GET['stype']<2){
+	$qs='&search='.urlencode($_GET['search']).'&stype='.$_GET['stype'];
 	if($_SESSION['current_tree']=='Folders') $art_filter='messung_%';
 	else $art_filter=$GLOBALS['bayeos_tree_unames'][$_SESSION['current_tree']];
 	$search=xml_call('TreeHandler.getAllChildren',
@@ -19,7 +22,7 @@ if(isset($_GET['search']) && $_GET['search']){
 					xmlrpc_array(array('mitarbeiter','projekte')),
 					new xmlrpcval('**/*'.$_GET['search'].'*','string'),
 					new xmlrpcval($art_filter,'string'),
-					new xmlrpcval(($_GET['subtreesearch']?-1:0),'int'),
+					new xmlrpcval(($_GET['stype']?-1:0),'int'),
 					new xmlrpcval(FALSE,'boolean'),
 					new xmlrpcval('week','string'),
 					new xmlrpcval(null,'null')

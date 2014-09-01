@@ -98,109 +98,38 @@ for($i=0;$i<count($_SESSION['clipboard']);$i++){
 }
 $row+=2;
 
-$timefilter=xmlrpc_array(array($_SESSION['csv_from'],$_SESSION['csv_until']),'dateTime.iso8601');
-if(! $_SESSION['csv_agrfunc'] || ! $_SESSION['csv_agrint'])	$filter_arg=xmlrpc_array(array(0,1,2),'int');
-else $filter_arg=xmlrpc_array(array($_SESSION['csv_agrfunc'],$_SESSION['csv_agrint']),'int');
 
 function nan($value){
 	if(is_nan($value)) return 'NA';
 	return $value;
 }
 
-if(count($_SESSION['clipboard'])==1){
-	if(! $_SESSION['csv_agrfunc'] || !$_SESSION['csv_agrint']){
-		$val=xml_call('MassenTableHandler.getRows',
-				array(new xmlrpcval($_SESSION['clipboard'][0][2],'int'),
-						$timefilter,
-						$filter_arg));
-		$val=$val[1]->scalar;
-		$pos=0;
-		while($pos<strlen($val)){
-			$col=0;
-			$tmp=unpack('N',substr($val,$pos,4));
-			$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
-			$objPHPExcel->getActiveSheet()->getStyle($cell)
-			->getNumberFormat()
-			->setFormatCode('dd.mm.yyyy hh:mm:ss');
-			$t=strptime(date('Y-m-d H:i:s',$tmp[1]),'%Y-%m-%d %H:%M:%S');
-			$value=PHPExcel_Shared_Date::PHPToExcel(
-					gmmktime($t['tm_hour'],$t['tm_min'],$t['tm_sec'],
-							$t['tm_mon']+1,$t['tm_mday'],$t['tm_year']+1900));				
-			$objPHPExcel->getActiveSheet()->setCellValue($cell,$value);
-			$col++;
-			$tmp=unpack('N',substr($val,$pos+4,4));
-			$t=pack('L',$tmp[1]);
-			$tmp=unpack('f',$t);
-			$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
-			$objPHPExcel->getActiveSheet()->setCellValue($cell,nan($tmp[1]));
-			$pos+=9;
-			$row++;
-		}
-	} else {
-		$val=xml_call('AggregationTableHandler.getRows',
-				array(new xmlrpcval($_SESSION['clipboard'][0][2],'int'),
-						$timefilter,
-						$filter_arg));
-		$val=$val[1];
-		for($j=0;$j<count($val);$j++){
-			$col=0;
-			$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
-			$objPHPExcel->getActiveSheet()->getStyle($cell)
-			->getNumberFormat()
-			->setFormatCode('dd.mm.yyyy hh:mm:ss');
-			$t=strptime(date('Y-m-d H:i:s',$val[$j][0]->timestamp-3600),'%Y-%m-%d %H:%M:%S');
-			$value=PHPExcel_Shared_Date::PHPToExcel(
-					gmmktime($t['tm_hour'],$t['tm_min'],$t['tm_sec'],
-							$t['tm_mon']+1,$t['tm_mday'],$t['tm_year']+1900));
-			
-			$objPHPExcel->getActiveSheet()->setCellValue($cell,$value);
-			$col++;
-			$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
-			$objPHPExcel->getActiveSheet()->setCellValue($cell,nan($val[$j][1]));
-			$row++;
-		}
-	}
-} else {
-	if(!$_SESSION['csv_agrfunc'] || !$_SESSION['csv_agrint']){
-		$func='MassenTableHandler.getMatrix';
-	}
-	else {
-		$func='AggregationTableHandler.getMatrix';
-	}
-	$val=xml_call($func,
-			array(xmlrpc_array($ids,'int'),
-					$timefilter,
-					$filter_arg,
-					new xmlrpcval(false,'boolean')));
-	$val=$val[1]->scalar;
-	$pos=0;
-	while($pos<strlen($val)){
-		$col=0;
-		$tmp=unpack('N',substr($val,$pos,4));
-		$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
-		$objPHPExcel->getActiveSheet()->getStyle($cell)
-			->getNumberFormat()
-			->setFormatCode('dd.mm.yyyy hh:mm:ss');
-		$t=strptime(date('Y-m-d H:i:s',$tmp[1]),'%Y-%m-%d %H:%M:%S');
-		$value=PHPExcel_Shared_Date::PHPToExcel(
-					gmmktime($t['tm_hour'],$t['tm_min'],$t['tm_sec'],
-							$t['tm_mon']+1,$t['tm_mday'],$t['tm_year']+1900));				
-		$objPHPExcel->getActiveSheet()->setCellValue($cell,$value);
-		$pos+=4;
-		for($j=0;$j<count($ids);$j++){
-			$col++;
-			$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
-			$tmp=unpack('N',substr($val,$pos,4));
-			$t=pack('L',$tmp[1]);
-			$tmp=unpack('f',$t);
-			$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
-			$objPHPExcel->getActiveSheet()->setCellValue($cell,nan($tmp[1]));
-			$pos+=4;
-		}
-		$row++;
-	}
-}
+//Get Data
+$timefilter=xmlrpc_array(array($_SESSION['csv_from'],$_SESSION['csv_until']),'dateTime.iso8601');
+if(! $_SESSION['csv_agrfunc'] || ! $_SESSION['csv_agrint'])	$filter_arg=xmlrpc_array($_SESSION['StatusFilter'],'int');
+else $filter_arg=xmlrpc_array(array($_SESSION['csv_agrfunc'],$_SESSION['csv_agrint']),'int');
 
+$data=getSeries($ids, $_SESSION['csv_agrfunc'],  $_SESSION['csv_agrint'], $timefilter, $filter_arg);
+
+//Build up XML-Object
+for($i=0;$i<count($data['datetime']);$i++){
+	$col=0;
+	$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
+	$objPHPExcel->getActiveSheet()->getStyle($cell)
+	->getNumberFormat()
+	->setFormatCode('dd.mm.yyyy hh:mm:ss');
+	$t=strptime(date('Y-m-d H:i:s',$data['datetime'][$i]),'%Y-%m-%d %H:%M:%S');
+	$value=PHPExcel_Shared_Date::PHPToExcel(
+			gmmktime($t['tm_hour'],$t['tm_min'],$t['tm_sec'],
+					$t['tm_mon']+1,$t['tm_mday'],$t['tm_year']+1900));
+	$objPHPExcel->getActiveSheet()->setCellValue($cell,$value);
+	for($j=0;$j<count($ids);$j++){
+		$col++;
+		$cell=PHPExcel_Cell::stringFromColumnIndex($col).($row);
+		$objPHPExcel->getActiveSheet()->setCellValue($cell,nan($data[$j][$i]));
+	}
+	$row++;
+}
 
 // Rename worksheet
 $objPHPExcel->getActiveSheet()->setTitle('Export');

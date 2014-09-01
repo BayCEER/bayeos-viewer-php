@@ -58,63 +58,16 @@ $timefilter=xmlrpc_array(array($_SESSION['csv_from'],$_SESSION['csv_until']),'da
 if(! $_SESSION['csv_agrfunc'] || ! $_SESSION['csv_agrint'])	$filter_arg=xmlrpc_array($_SESSION['StatusFilter'],'int');
 else $filter_arg=xmlrpc_array(array($_SESSION['csv_agrfunc'],$_SESSION['csv_agrint']),'int');
 	
+$data=getSeries($ids, $_SESSION['csv_agrfunc'],  $_SESSION['csv_agrint'], $timefilter, $filter_arg);
 
-
-if(count($_SESSION['clipboard'])==1){
-	if(! $_SESSION['csv_agrfunc'] || !$_SESSION['csv_agrint']){
-		$val=xml_call('MassenTableHandler.getRows',
-				array(new xmlrpcval($_SESSION['clipboard'][0][2],'int'),
-						$timefilter,
-						$filter_arg));
-		$val=$val[1]->scalar;
-		$pos=0;
-		while($pos<strlen($val)){
-			$tmp=unpack('N',substr($val,$pos,4));
-			$out.=date($_SESSION['csv_dateformat'],$tmp[1]);
-			$tmp=unpack('N',substr($val,$pos+4,4));
-			$t=pack('L',$tmp[1]);
-			$tmp=unpack('f',$t);
-			$out.=$_SESSION['csv_sep'].str_replace('.',$_SESSION['csv_dec'],$tmp[1])."\n";
-			$pos+=9;
-		}
-	} else {
-		$val=xml_call('AggregationTableHandler.getRows',
-				array(new xmlrpcval($_SESSION['clipboard'][0][2],'int'),
-						$timefilter,
-						$filter_arg));
-		$val=$val[1];
-		for($j=0;$j<count($val);$j++){
-			$out.=date($_SESSION['csv_dateformat'],$val[$j][0]->timestamp-3600).$_SESSION['csv_sep'].str_replace('.',$_SESSION['csv_dec'],$val[$j][1])."\n";
-		}
+for($i=0;$i<count($data['datetime']);$i++){
+	$out.=date($_SESSION['csv_dateformat'],$data['datetime'][$i]);
+	for($j=0;$j<$cols;$j++){
+		$out.=$_SESSION['csv_sep'].str_replace('.',$_SESSION['csv_dec'],round($data[$j][$i],5));
 	}
-} else {
-	if(!$_SESSION['csv_agrfunc'] || !$_SESSION['csv_agrint']){
-		$func='MassenTableHandler.getMatrix';
-	}
-	else {
-		$func='AggregationTableHandler.getMatrix';
-	}
-	$val=xml_call($func,
-				array(xmlrpc_array($ids,'int'),
-					  $timefilter,
-					  $filter_arg,
-					  new xmlrpcval(false,'boolean')));
-	$val=$val[1]->scalar;
-	$pos=0;
-	while($pos<strlen($val)){
-		$tmp=unpack('N',substr($val,$pos,4));
-		$pos+=4;
-		$out.=date($_SESSION['csv_dateformat'],$tmp[1]);
-		for($j=0;$j<$cols;$j++){
-			$tmp=unpack('N',substr($val,$pos,4));
-			$t=pack('L',$tmp[1]);
-			$tmp=unpack('f',$t);
-			$out.=$_SESSION['csv_sep'].str_replace('.',$_SESSION['csv_dec'],$tmp[1]);
-			$pos+=4;
-		}
-		$out.="\n";
-	}	
+	$out.="\n";
 }
+
 
 header("Content-Length: " . strlen($out));
 header("Content-type: text/x-csv charset=UTF-8");
