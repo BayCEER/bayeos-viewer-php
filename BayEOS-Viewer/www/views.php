@@ -172,11 +172,22 @@ function echo_saved_cb_dropdown(){
 }
 
 
-function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
-	echo '<form method="POST" class="form" role="form">';
-	if($tfilter){
+function echo_filter_form($name='Filter'){
 	echo '<div class="block">
-	<div class="block-header">Filter</div>
+	 <div class="block-header">Chart and Download Options</div>
+	 <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+<li class="active"><a href="#tfilter" data-toggle="tab">Time Filter</a></li>
+<li><a href="#sfilter" data-toggle="tab">Status Filter</a></li>
+<li><a href="#csvoptions" data-toggle="tab">Download Options</a></li>
+<li><a href="#chartoptions" data-toggle="tab">Chart Limits</a></li>
+</ul>
+<br/>
+';
+	
+	
+	echo '<form method="POST" class="form" role="form">
+	<div id="my-tab-content" class="tab-content">
+	<div class="tab-pane active" id="tfilter">
 	<div class="row">
 	<input type="hidden" name="action" value="filter">
 	';
@@ -186,15 +197,7 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 	echo_field("session_agrint",'Aggregation Interval','AgrIntervalle',$_SESSION['agrint'],3);
 	echo '</div>
 	</div>
-	';
-	}
-	if($sfilter){
-	echo '
-	<div class="block">
-	<div class="block-header">
-	Status Filter
-	</div>
-	
+	<div class="tab-pane" id="sfilter">
 	<div class="row">
 	<input type="hidden" name="setStatusFilter" value=1>';
 	reset($_SESSION['Status']);
@@ -204,13 +207,8 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 	}
 	reset($_SESSION['Status']);
 	echo '</div>	
-	</div>';
-	}
-	if($csvoptions){
-	echo '<div class="block">
-	<div class="block-header">
-	Download Options
 	</div>
+	<div class="tab-pane" id="csvoptions">
 	
 	<div class="row">
 	<input type="hidden" name="setCSVOptions" value=1>
@@ -233,20 +231,24 @@ function echo_filter_form($name='Filter',$tfilter=1,$sfilter=1,$csvoptions=1){
 			array('selectvalues'=>array('Y-m-d H:i:s','d.m.Y H:i:s')));
 	
 	echo '</div>
-	</div>';
-	}
-	echo '
+	</div>
+	<div class="tab-pane" id="chartoptions">
+		<div class="row">
+		';
+	echo_field("chart_min",'Min','int',$_POST['chart_min'],3);
+	echo_field("chart_max",'Max','int',$_POST['chart_max'],3);
+	echo '</div>
+		</div>
+	</div></div>
 	<div class="block-action">';
 	echo_button('Update','ok',"","btn btn-primary"); 
 	echo_button('Download','download-alt',"","btn btn-primary",'name="download"');
 //	echo_button('XLSX','download-alt',"","btn btn-primary",'name="xlsx"');
-	if($tfilter){
-		if($name=='Filter')
-			echo_button('Clipboard','pushpin',"?tab=Clipboard");
-		else
-			echo_button('Chart','signal',"","btn btn-primary",'name="chart"');
-		echo_button('Add Series','folder-open',"?tab=Folders");
-	}
+	if($name=='Filter')
+		echo_button('Clipboard','pushpin',"?tab=Clipboard");
+	else
+		echo_button('Chart','signal',"","btn btn-primary",'name="chart"');
+	echo_button('Add Series','folder-open',"?tab=Folders");
 	echo '				
 	</div>
 	</form>';

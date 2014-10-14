@@ -32,7 +32,7 @@ if(isset($_GET['search']) && $_GET['search'] && $_GET['stype']<2){
 	for($i=0;$i<count($search);$i++){
 		$childs[$i]=array(2=>$search[$i][0],4=>$search[$i][9],5=>$search[$i][7],
 				6=>$search[$i][5],7=>$search[$i][6]);
-		if($_GET['subtreesearch']) $childs[$i]['path']=array($search[$i][1],$search[$i][8]);
+		if($_GET['stype']) $childs[$i]['path']=array($search[$i][1],$search[$i][8]);
 	}
 
 } else {

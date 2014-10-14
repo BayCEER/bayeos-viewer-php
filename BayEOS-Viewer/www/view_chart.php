@@ -180,7 +180,9 @@ var graph<?php echo $p;?> = new Rickshaw.Graph({
 	element: document.querySelector("#chart<?php echo $p;?>"),
 	renderer: 'line',
 	interpolation: 'linear',
-	min: 'auto',
+	min: <?php if(isset($_POST['chart_min']) && is_numeric($_POST['chart_min'])) echo $_POST['chart_min'];
+	else echo "'auto'";?>
+	<?php if(isset($_POST['chart_max']) && is_numeric($_POST['chart_max'])) echo ',max: '.$_POST['chart_max'];?>,
 	series: [
 <?php 
 if($_SESSION['chartdata']){
@@ -314,7 +316,7 @@ echo '<div class="btn-group">
 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" >
 <span class="glyphicon glyphicon-resize-horizontal"></span> Interval <span class="caret"></span></button>
 		 <ul class="dropdown-menu" role="menu">';
-$interval=array('today','yesterday','this week','last week','this month','last month','this year','last year');
+$interval=array('today','last 24 hours','last 3 days','last 7 days','last 30 days','yesterday','this week','last week','this month','last month','this year','last year');
 for($i=0;$i<count($interval);$i++){
 	echo '<li><a href="?interval='.urlencode($interval[$i]).'">'.htmlspecialchars($interval[$i]).'</a></li>';
 }

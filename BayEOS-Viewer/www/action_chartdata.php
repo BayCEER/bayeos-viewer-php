@@ -37,7 +37,6 @@ if(isset($_POST['ts'])){
 		if(isset($_POST['_action_remove'])){
 			$res=xml_call('MassenTableHandler.removeRowsByInterval',
 					array(new xmlrpcval($_SESSION['clipboard'][$i][2],'int'),
-							new xmlrpcval('messung_massendaten','string'),
 							$from,
 							$until));
 			if($res)

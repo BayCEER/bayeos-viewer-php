@@ -102,6 +102,7 @@ else $filter_arg=xmlrpc_array(array($agrfunc,$agrint),'int');
 $data=getSeries(array($_GET['edit']), $agrfunc, $agrint, 
 		xmlrpc_array(array(toios8601FromEpoch($from),toios8601FromEpoch($until)),'dateTime.iso8601'),
 		$filter_arg);
+
 echo "{ data: [";
 $comma=0;
 for($j=0;$j<count($data['datetime']);$j++){
@@ -189,7 +190,7 @@ if($no_data) echo '<div class="alert alert-danger">Selection returns no data. Pl
 echo_field("from",'From','dateTime.iso8601',date('Y-m-d H:i',$from),3);
 echo_field("until",'Until','dateTime.iso8601',date('Y-m-d H:i',$until),3);
 echo_field("interval",'Interval','SelectValue',$_POST['interval'],
-			3,array('selectvalues'=>array('','today','yesterday','this week','last week','this month','last month','this year','last year')));
+			3,array('selectvalues'=>array('','today','last 24 hours','last 3 days','last 7 days','last 30 days','yesterday','this week','last week','this month','last month','this year','last year')));
 echo '<div class="col-sm-3 col-lg-3"><br/>';
 echo_button('Refresh','refresh',"","btn btn-primary",'');
 echo_button('to Editor','zoom-in',"","btn btn-primary",' name="ts_to_editor"');

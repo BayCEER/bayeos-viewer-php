@@ -14,6 +14,22 @@ function add_alert($text,$type='success',$dismissable=TRUE){
 
 function set_post_from_until($interval){
 	switch($interval){
+		case 'last 24 hours':
+			$_POST['from']=date('y-m-d h:i',time()-3600*24);
+			$_POST['until']=date('y-m-d h:i',time());
+			break;
+		case 'last 3 days':
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24*3);
+			$_POST['until']=date('y-m-d h:i',time());
+			break;
+		case 'last 7 days':
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24*7);
+			$_POST['until']=date('y-m-d h:i',time());
+			break;
+		case 'last 30 days':
+			$_POST['from']=date('y-m-d 00:00',time()-3600*24*30);
+			$_POST['until']=date('y-m-d h:i',time());
+			break;
 		case 'today':
 			$_POST['from']=date('y-m-d 00:00');
 			$_POST['until']=date('y-m-d 00:00',time()+3600*24);
@@ -328,10 +344,11 @@ function addToClipboard($node,$alert=1){
 
 function getSeries($ids,$aggfunc,$aggint,$timefilter,$filter_arg){
 	$res=array();
+	if(! is_array($ids)) $ids=array($ids);
 	if(count($ids)==1){
 		if(! $aggfunc || !$aggint){
 			$val=xml_call('MassenTableHandler.getRows',
-					array(new xmlrpcval($_SESSION['clipboard'][0][2],'int'),
+					array(new xmlrpcval($ids[0],'int'),
 							$timefilter,
 							$filter_arg));
 			$val=$val[1]->scalar;
@@ -351,7 +368,7 @@ function getSeries($ids,$aggfunc,$aggint,$timefilter,$filter_arg){
 			}
 		} else {
 			$val=xml_call('AggregationTableHandler.getRows',
-					array(new xmlrpcval($_SESSION['clipboard'][0][2],'int'),
+					array(new xmlrpcval($ids[0],'int'),
 							$timefilter,
 							$filter_arg));
 			$val=$val[1];
