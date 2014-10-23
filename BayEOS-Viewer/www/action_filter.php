@@ -38,8 +38,13 @@ if(isset($_POST['download'])){
 	$_SESSION['agrfunc']=$_POST['session_agrfunc'];
 }
 
-if(isset($_POST['chart']))
+if(isset($_POST['chart']))	
 	$_SESSION['tab']='Chart';
 
-
+if(isset($_POST['renderer'])){
+	$_SESSION['renderer']=$_POST['renderer'];
+	$_SESSION['interpolate']=$_POST['interpolate'];
+	if($_SESSION['renderer']!='line')
+		$_SESSION['interpolate']=0;
+}
 ?>

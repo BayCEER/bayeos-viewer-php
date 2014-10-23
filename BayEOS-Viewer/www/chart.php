@@ -95,7 +95,7 @@ for($i=$min_i;$i<$max_i;$i++){
 		}	
 	}
 	fclose($f);
-	$gp.=($i>$min_i?', ':'').'"'.$datafiles[$i].'" using 1:3 axes x1y1 title "'.$_SESSION['clipboard'][$i][5].'" with lines lt '.($i+1);
+	$gp.=($i>$min_i?', ':'').'"'.$datafiles[$i].'" using 1:3 axes x1y1 title "'.$_SESSION['clipboard'][$i]['subfolder'].' '.$_SESSION['clipboard'][$i][5].'" with lines lt '.($i+1);
 }
 $f=fopen($prefix.'.gp','w');
 fwrite($f,$gp."\n");

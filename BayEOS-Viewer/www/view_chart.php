@@ -178,7 +178,9 @@ $('#chart<?php echo $p;?>').on('click', function() { selectedX[currentX]=1; setS
 	
 var graph<?php echo $p;?> = new Rickshaw.Graph({
 	element: document.querySelector("#chart<?php echo $p;?>"),
-	renderer: 'line',
+	renderer: '<?php if(! isset($_SESSION['renderer'])) $_SESSION['renderer']='line';
+	echo $_SESSION['renderer'];?>',
+
 	interpolation: 'linear',
 	min: <?php if(isset($_POST['chart_min']) && is_numeric($_POST['chart_min'])) echo $_POST['chart_min'];
 	else echo "'auto'";?>
@@ -192,7 +194,9 @@ if($_SESSION['chartdata']){
 }
 $unit=array();
 
-for($i=0;$i<count($series[$p]);$i++){	
+$chart_error_messages=array();
+for($i=0;$i<count($series[$p]);$i++){
+	$ccount=0; //Counts points following directly after on another...	
 	$res=xml_call('ObjektHandler.getLowestRefObjekt',
 			array(new xmlrpcval($series[$p][$i][2],'int'),
 					new xmlrpcval('mess_einheit','string')));
@@ -202,21 +206,31 @@ for($i=0;$i<count($series[$p]);$i++){
 	$comma=0;
 	echo "{ data: [";
 	for($j=0;$j<count($data['datetime']);$j++){
-		if($comma) echo ",\n";
+		if($comma){
+			echo ",\n";
+			$comma=0;
+		}
 		if(! $_SESSION['interpolate'] && $j>1 && ($data['datetime'][$j]-$data['datetime'][$j-1])>=
 				2*($data['datetime'][$j-1]-$data['datetime'][$j-2])){
 			echo "{x:".($data['datetime'][$j-1]+($data['datetime'][$j]-$data['datetime'][$j-1])).",y:null},\n";
 			$comma=0;
+			if($ccount<2) $ccount=0;
 		}
 		if(! $_SESSION['interpolate'] || ! is_nan($data[($i+$p)][$j])){
 			echo "{x:".$data['datetime'][$j].
 		",y:".(is_nan($data[($i+$p)][$j])?'null':round($data[($i+$p)][$j],5))."}";
 			$comma=1;
+			if(! is_nan($data[($i+$p)][$j])) $ccount++;
+			elseif($ccount<2) $ccount=0; 
 		}
 	}
 	echo "],
 	color: palette.color(),
     name: '".$series[$p][$i]['subfolder'].' <b>'.$series[$p][$i][5].'</b>'.($unit[$i]?" [$unit[$i]]":'')."'}";
+	
+	if($ccount<2 && ! $_SESSION['interpolate'] && $_SESSION['renderer']=='line' ) 
+		$chart_error_messages[]=' <b>'.$series[$p][$i]['subfolder'].$series[$p][$i][5].'</b>
+	 does not show data (different resolution!). Try setting interpolate in chart options.';
 }
 
 
@@ -289,6 +303,10 @@ yAxis<?php echo $p;?>.render();
 <?php
 }
 if($no_data) echo '<div class="alert alert-danger">At least on series returns no data. Plotting will not work.</div>';
+for($i=0;$i<count($chart_error_messages);$i++){
+	echo '<div class="alert alert-danger">'.$chart_error_messages[$i].'</div>';
+}
+
 } //rickshaw ploting
 } // clipboard empty!
 //Actionblock for zoom, move + data
@@ -309,8 +327,8 @@ if(count($_SESSION['clipboard'])>1){
 if(! $_SESSION['gnuplot']){
 	if($_SESSION['chartdata']) echo_button('Hide Data','arrow-up',"?chartdata=0");
 	else echo_button('Show Data','arrow-down',"?chartdata=1");
-	if($_SESSION['interpolate']) echo_button('Show gaps','pause',"?interpolate=0");
-	else echo_button('Interpolate','minus',"?interpolate=1");
+//	if($_SESSION['interpolate']) echo_button('Show gaps','pause',"?interpolate=0");
+//	else echo_button('Interpolate','minus',"?interpolate=1");
 }
 echo '<div class="btn-group">
 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" >

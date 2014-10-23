@@ -176,10 +176,10 @@ function echo_filter_form($name='Filter'){
 	echo '<div class="block">
 	 <div class="block-header">Chart and Download Options</div>
 	 <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-<li class="active"><a href="#tfilter" data-toggle="tab">Time Filter</a></li>
-<li><a href="#sfilter" data-toggle="tab">Status Filter</a></li>
-<li><a href="#csvoptions" data-toggle="tab">Download Options</a></li>
-<li><a href="#chartoptions" data-toggle="tab">Chart Limits</a></li>
+<li class="active"><a href="#tfilter" data-toggle="tab">Time</a></li>
+<li><a href="#sfilter" data-toggle="tab">Status</a></li>
+<li><a href="#csvoptions" data-toggle="tab">Download</a></li>
+'.($_SESSION['gnuplot']?'':'<li><a href="#chartoptions" data-toggle="tab">Chart</a></li>').'
 </ul>
 <br/>
 ';
@@ -237,6 +237,9 @@ function echo_filter_form($name='Filter'){
 		';
 	echo_field("chart_min",'Min','int',$_POST['chart_min'],3);
 	echo_field("chart_max",'Max','int',$_POST['chart_max'],3);
+	echo_field("renderer",'Plot type','SelectValue',$_SESSION['renderer'],3,
+			array('selectvalues'=>array('line','scatterplot','area','bar')));
+	echo_field('interpolate', 'Interpolate points (only applicable for type line)', 'boolean',$_SESSION['interpolate'],3);
 	echo '</div>
 		</div>
 	</div></div>
