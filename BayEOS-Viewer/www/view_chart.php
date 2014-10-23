@@ -197,6 +197,7 @@ $unit=array();
 $chart_error_messages=array();
 for($i=0;$i<count($series[$p]);$i++){
 	$ccount=0; //Counts points following directly after on another...	
+	$dcount=0; //Counts non NAN points 
 	$res=xml_call('ObjektHandler.getLowestRefObjekt',
 			array(new xmlrpcval($series[$p][$i][2],'int'),
 					new xmlrpcval('mess_einheit','string')));
@@ -220,15 +221,22 @@ for($i=0;$i<count($series[$p]);$i++){
 			echo "{x:".$data['datetime'][$j].
 		",y:".(is_nan($data[($i+$p)][$j])?'null':round($data[($i+$p)][$j],5))."}";
 			$comma=1;
-			if(! is_nan($data[($i+$p)][$j])) $ccount++;
+			if(! is_nan($data[($i+$p)][$j])){
+				$ccount++;
+				$dcount++;
+			}
 			elseif($ccount<2) $ccount=0; 
 		}
 	}
+	if($dcount==0 && $_SESSION['interpolate']) echo "{x:".$data['datetime'][0].',y:null}';
 	echo "],
 	color: palette.color(),
     name: '".$series[$p][$i]['subfolder'].' <b>'.$series[$p][$i][5].'</b>'.($unit[$i]?" [$unit[$i]]":'')."'}";
 	
-	if($ccount<2 && ! $_SESSION['interpolate'] && $_SESSION['renderer']=='line' ) 
+	if($dcount==0)
+		$chart_error_messages[]=' <b>'.$series[$p][$i]['subfolder'].$series[$p][$i][5].'</b>
+		does not have data in the selected interval.';
+	elseif($ccount<2 && ! $_SESSION['interpolate'] && $_SESSION['renderer']=='line' ) 
 		$chart_error_messages[]=' <b>'.$series[$p][$i]['subfolder'].$series[$p][$i][5].'</b>
 	 does not show data (different resolution!). Try setting interpolate in chart options.';
 }
@@ -302,11 +310,12 @@ yAxis<?php echo $p;?>.render();
 </script>
 <?php
 }
-if($no_data) echo '<div class="alert alert-danger">At least on series returns no data. Plotting will not work.</div>';
-for($i=0;$i<count($chart_error_messages);$i++){
-	echo '<div class="alert alert-danger">'.$chart_error_messages[$i].'</div>';
+if($no_data) echo '<div class="alert alert-danger">Nothing to plot: Series do not have data in the selected interval.</div>';
+else {
+	for($i=0;$i<count($chart_error_messages);$i++){
+		echo '<div class="alert alert-danger">'.$chart_error_messages[$i].'</div>';
+	}
 }
-
 } //rickshaw ploting
 } // clipboard empty!
 //Actionblock for zoom, move + data
