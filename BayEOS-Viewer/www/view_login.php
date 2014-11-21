@@ -1,5 +1,13 @@
 
-<form class="form-signin" action="./" method="POST" role="form"
+<form class="form-signin" action="./<?php 
+$qs=array();
+if(isset($_GET['id'])) $qs[]="id=$_GET[id]";
+if(isset($_GET['edit'])) $qs[]="edit=$_GET[edit]";
+if(isset($_GET['tab'])) $qs[]="tab=$_GET[tab]";
+if(isset($_GET['view'])) $qs[]="view=$_GET[view]";
+if(count($qs)) echo '?'.implode("&",$qs);
+unset($qs);
+?>" method="POST" role="form"
 	id="loginForm" autocomplete="off">
 	<p class="lead strong">Please sign in</p>
 	<script type="text/javascript">

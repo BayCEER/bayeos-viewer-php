@@ -17,7 +17,15 @@
 
 
 require_once './functions.php';
-require_once './actions.php';
+/***********************************************************
+ * Login Action
+***********************************************************/
+
+if(isset($_POST['login']) && isset($_POST['password'])){
+	require 'action_login.php';
+}
+if(isset($_SESSION['bayeosauth']))
+	require_once './actions.php';
 require_once './views.php';
 
 
