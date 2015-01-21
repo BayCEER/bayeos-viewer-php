@@ -15,20 +15,20 @@ function add_alert($text,$type='success',$dismissable=TRUE){
 function set_post_from_until($interval){
 	switch($interval){
 		case 'last 24 hours':
-			$_POST['from']=date('y-m-d h:i',time()-3600*24);
-			$_POST['until']=date('y-m-d h:i',time());
+			$_POST['from']=date('y-m-d H:i',time()-3600*24);
+			$_POST['until']=date('y-m-d H:i',time());
 			break;
 		case 'last 3 days':
 			$_POST['from']=date('y-m-d 00:00',time()-3600*24*3);
-			$_POST['until']=date('y-m-d h:i',time());
+			$_POST['until']=date('y-m-d H:i',time());
 			break;
 		case 'last 7 days':
 			$_POST['from']=date('y-m-d 00:00',time()-3600*24*7);
-			$_POST['until']=date('y-m-d h:i',time());
+			$_POST['until']=date('y-m-d H:i',time());
 			break;
 		case 'last 30 days':
 			$_POST['from']=date('y-m-d 00:00',time()-3600*24*30);
-			$_POST['until']=date('y-m-d h:i',time());
+			$_POST['until']=date('y-m-d H:i',time());
 			break;
 		case 'today':
 			$_POST['from']=date('y-m-d 00:00');
