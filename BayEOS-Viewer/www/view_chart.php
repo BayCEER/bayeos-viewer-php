@@ -81,10 +81,10 @@ else width=width-48;
 <?php 
 if($_SESSION['chartmulti']){
 	for($i=0;$i<$max_i;$i++){ ?>
-		document.write('<img src="chart.php?x='+width+'&i=<?php echo $i;?>"><br/>');
+		document.write('<div class="thumbnail"><img src="chart.php?x='+width+'&i=<?php echo $i;?>"></div><br/>');
 <?php }
 } else { ?>
-document.write('<img src="chart.php?x='+width+'">');
+document.write('<div class="thumbnail"><img src="chart.php?x='+width+'"></div>');
 <?php }?>
 </script>
 <?php } 

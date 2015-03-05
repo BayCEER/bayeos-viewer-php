@@ -23,6 +23,7 @@ if(! count($_SESSION['clipboard'])){
 
 $prefix=tempnam("/dev/shm/",'bayeos');
 if(! isset($_GET['x'])) $_GET['x']=640;
+if($_GET['x']<400) $_GET['x']=400;
 $_GET['y']=round($_GET['x']/2);
 if($_GET['y']>350) $_GET['y']=350;
 
@@ -34,9 +35,7 @@ if(isset($_GET['i'])){
 	$max_i=count($_SESSION['clipboard']);
 }
 
-if($_GET['x']<300) $font=7;
-elseif($_GET['x']<400) $font=8;
-elseif($_GET['x']<500) $font=9;
+if($_GET['x']<500) $font=9;
 elseif($_GET['x']<600) $font=10;
 else $font=11;
 
