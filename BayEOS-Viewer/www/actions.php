@@ -176,6 +176,7 @@ if($_REQUEST['action']=='settings_clipboard' && $_POST['save_as']){
 		$ids[]=$_SESSION['clipboard'][$i][2];
 	}
 	$_SESSION['cb_saved'][$_POST['save_as']]=$ids;
+	ksort($_SESSION['cb_saved']);
 	updateCookies();
 	add_alert('Clipboard saved as '.$_POST['save_as']);
 }

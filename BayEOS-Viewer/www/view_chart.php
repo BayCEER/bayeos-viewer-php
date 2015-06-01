@@ -1,6 +1,5 @@
 <?php 
 //Limit Plotting to five series
-
 if(count($_SESSION['clipboard'])>$_SESSION['max_cols']){
 	$max_i=$_SESSION['max_cols'];
 	add_alert('You have more than '.$_SESSION['max_cols'].

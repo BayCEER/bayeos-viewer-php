@@ -43,11 +43,13 @@ if($res===false) {
 	$_SESSION['chartdata']=0;
 	$_SESSION['chartmulti']=0;
 	$_SESSION['treefilter']=0;
+	$_SESSION['interpolate']=0;
 	$_SESSION['csv_tz']=$_SESSION['tz'];
 
 	//Cookie settings
 	$_SESSION['cb_saved']=array();
 	if(isset($_COOKIE['cb_saved'])) $_SESSION['cb_saved']=unserialize($_COOKIE['cb_saved']);
+	ksort($_SESSION['cb_saved']);
 	if(isset($_COOKIE['max_rows']) && is_numeric($_COOKIE['max_rows']))
 		$_SESSION['max_rows']=$_COOKIE['max_rows'];
 	else 
