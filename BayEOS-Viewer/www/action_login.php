@@ -48,7 +48,10 @@ if($res===false) {
 
 	//Cookie settings
 	$_SESSION['cb_saved']=array();
+	$pref=xml_call('PreferenceHandler.getPreferences',array(new xmlrpcval('bayeosviewer','string')));
 	if(isset($_COOKIE['cb_saved'])) $_SESSION['cb_saved']=unserialize($_COOKIE['cb_saved']);
+	if(isset($pref['cb_saved'])) $_SESSION['cb_saved']=array_merge($_SESSION['cb_saved'],unserialize($pref['cb_saved']));
+	unset($pref);
 	ksort($_SESSION['cb_saved']);
 	if(isset($_COOKIE['max_rows']) && is_numeric($_COOKIE['max_rows']))
 		$_SESSION['max_rows']=$_COOKIE['max_rows'];
@@ -60,6 +63,8 @@ if($res===false) {
 		$_SESSION['max_cols']=5;
 	if(isset($_COOKIE['gnuplot'])) $_SESSION['gnuplot']=$_COOKIE['gnuplot'];
 	else $_SESSION['gnuplot']=0;
+	if(isset($_COOKIE['cb2db'])) $_SESSION['cb2db']=$_COOKIE['cb2db'];
+	else $_SESSION['cb2db']=1;
 	updateCookies();
 	
 	

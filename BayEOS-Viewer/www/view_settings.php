@@ -4,9 +4,10 @@
 <div class="row">
 <input type="hidden" name="action" value="settings">
 <?php
-echo_field("max_cols",'Maximum number of series','INT',$_SESSION['max_cols'],4);
-echo_field("max_rows",'Maximum number of datapoints','INT',$_SESSION['max_rows'],4);
-echo_field("gnuplot",'Render plot as image (Check if normal chart plotting does not work on your device)','boolean',$_SESSION['gnuplot'],4);
+echo_field("max_cols",'Maximum number of series','INT',$_SESSION['max_cols'],3);
+echo_field("max_rows",'Maximum number of datapoints','INT',$_SESSION['max_rows'],3);
+echo_field("gnuplot",'Render plot as image (Check if normal chart plotting does not work on your device)','boolean',$_SESSION['gnuplot'],3);
+echo_field("cb2db",'Save clipboards on server','boolean',$_SESSION['cb2db'],3);
 ?>
 </div>
 </div>
