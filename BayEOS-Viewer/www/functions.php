@@ -94,11 +94,13 @@ function updateCookies(){
 	setcookie('max_rows',$_SESSION['max_rows'],time()+3600*24*180);
 	setcookie('gnuplot',$_SESSION['gnuplot'],time()+3600*24*180);
 	setcookie('cb2db',$_SESSION['cb2db'],time()+3600*24*180);
-	if($_SESSION['cb2db'])
+	if($_SESSION['cb2db']){
 		xml_call('PreferenceHandler.setPreference',
 				array(new xmlrpcval('bayeosviewer','string'),
 					  new xmlrpcval('cb_saved','string'),
 					  new xmlrpcval(serialize($_SESSION['cb_saved']),'string')));
+		setcookie('cb_saved',null,-1);
+	}
 	else
 		setcookie('cb_saved',serialize($_SESSION['cb_saved']),time()+3600*24*180);
 }
