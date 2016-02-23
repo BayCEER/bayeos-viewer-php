@@ -19,20 +19,35 @@ if($_GET['refclass']=='acl'){
 } elseif($_GET['refclass']=='roles'){
 	$return=getUserGroups($_GET['search'],'Gruppen');
 } elseif($_GET['refclass']){
-	$res=xml_call('TreeHandler.getAllChildren',
-				array(new xmlrpcval(get_root_id($_GET['refclass']),'int'),
+	$path='/';
+	$parent=get_root_id($_GET['refclass']);
+	if(substr($_GET['search'],0,1)=='/'){
+		$tmp=explode('/',$_GET['search']);
+		$search_prefix='';
+		$depth=0;
+	} else {
+		$tmp=array('',$_GET['search']);
+		$search_prefix='**/';
+		$depth=-1;
+	}
+	for($i=1;$i<count($tmp);$i++){
+		$res=xml_call('TreeHandler.getAllChildren',
+				array(new xmlrpcval($parent,'int'),
 						new xmlrpcval(false,'boolean'),
 						xmlrpc_array(array('mitarbeiter','projekte')),
-						new xmlrpcval('**/'.$_GET['search'].'*','string'),
+						new xmlrpcval($search_prefix.$tmp[$i].($i==(count($tmp)-1)?'*':''),'string'),
 						new xmlrpcval($_GET['refclass'],'string'),
-						new xmlrpcval(-1,'int'),
+						new xmlrpcval($depth,'int'),
 						new xmlrpcval(FALSE,'boolean'),
 						new xmlrpcval('week','string'),
 						new xmlrpcval(null,'null')
-				));
+		));
+		$parent=$res[0][0];
+		if($i<(count($tmp)-1)) $path.=$tmp[$i].'/';
+	}
 
 	for($i=0;$i<count($res);$i++){
-			array_push($return,array('label'=>$res[$i][8].$res[$i][7],'value'=>$res[$i][8].$res[$i][7],'id'=>$res[$i][0]));
+			array_push($return,array('label'=>$path.substr($res[$i][8],2).$res[$i][7],'value'=>$path.substr($res[$i][8],2).$res[$i][7],'id'=>$res[$i][0]));
 	}
 }
 echo(json_encode($return));

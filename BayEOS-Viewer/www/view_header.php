@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<?php 
+if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
+?><!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -10,7 +12,7 @@
 <link rel="stylesheet" href="css/signin.css">
 
 
-<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="<?php echo $config['customBootstrapHome'];?>css/bootstrap.min.css">
 <link rel="stylesheet" href="js/rickshaw.min.css">
 <link rel="stylesheet" href="css/main.css">
 <script type="text/javascript" src="js/jstz.min.js"></script>
@@ -31,7 +33,11 @@
 </head>
 <body>
 	<div id="wrap">
-		<nav class="navbar navbar-default">
+	<?php if(isset($config['customHeaderInclude']) && is_readable($config['customHeaderInclude']))
+		include $config['customHeaderInclude'];
+	?>
+		<nav class="navbar navbar-default<?php 
+		if(isset($config['customNavbarInverse']) && $config['customNavbarInverse']) echo " navbar-inverse";?>">
 			<div class="container">
 				<div class="navbar-header">
 					<?php if(isset($_SESSION['bayeosauth'])){?>

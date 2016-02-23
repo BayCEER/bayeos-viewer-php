@@ -2,6 +2,7 @@
 /**********************************************************
  * Global Constants
  *********************************************************/
+$config=parse_ini_file('/etc/bayeos-viewer.ini');
 
 $bayeos_trees=array('Folders','Units','Targets','Locations','Devices','Compartments');
 $bayeos_tree_unames=array('Folders'=>'messung_ordner','Units'=>'mess_einheit',

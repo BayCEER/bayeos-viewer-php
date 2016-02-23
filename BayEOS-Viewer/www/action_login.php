@@ -1,5 +1,4 @@
 <?php
-$config=parse_ini_file('/etc/bayeos-viewer.ini');
 if(isset($config['serverURL'])) $_SESSION['bayeosurl']=$config['serverURL'];
 else $_SESSION['bayeosurl']='http://'.$_SERVER['SERVER_ADDR'].'/BayEOS-Server/XMLServlet';
 

@@ -7,7 +7,7 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 1.0.9
+Version: 1.0.11
 Postinst: apache_reload
 Postrm: apache_reload
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
