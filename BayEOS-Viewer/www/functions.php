@@ -113,7 +113,7 @@ function get_object_fields($uname){
 				array('name'=>'Plan Start','nr'=>15,'cols'=>6,'type'=>'dateTime.iso8601','unr'=>3),
 				array('name'=>'Plan End','nr'=>16,'cols'=>6,'type'=>'dateTime.iso8601','unr'=>4),
 				array('name'=>'Description','nr'=>21,'cols'=>12,'type'=>'text','unr'=>1,'xmltype'=>'string'),
-				array('name'=>'Resolution','nr'=>22,'cols'=>4,'type'=>'int','unr'=>2,'default'=>600),
+				array('name'=>'Resolution (sec)','nr'=>22,'cols'=>4,'type'=>'int','unr'=>2),
 				array('name'=>'Interval Type','nr'=>23,'cols'=>4,'type'=>'IntervalTypes','unr'=>5,'xmltype'=>'int','default'=>0),
 				array('name'=>'Time Zone','nr'=>24,'cols'=>4,'type'=>'TimeZones','unr'=>6,'xmltype'=>'int','default'=>1)
 			);
@@ -355,6 +355,25 @@ function getSeries($ids,$aggfunc,$aggint,$timefilter,$filter_arg){
 	$res=array();
 	if(! is_array($ids)) $ids=array($ids);
 	if(count($ids)==1){
+		if($aggfunc && $aggint) {
+			$val=xml_call('AggregationTableHandler.getRows',
+					array(new xmlrpcval($ids[0],'int'),
+							$timefilter,
+							$filter_arg));
+			$val=$val[1];
+			for($j=0;$j<count($val);$j++){
+				$res['datetime'][$j]=$val[$j][0]->timestamp-3600;
+				$res[0][$j]=$val[$j][1];
+			}
+			if($j==0){
+				//aggregation not activ??
+				//Switch back to full resolution display
+				$aggfunc='';
+				$aggint='';
+				$filter_arg=xmlrpc_array($_SESSION['StatusFilter'],'int');
+			}
+		}
+		
 		if(! $aggfunc || !$aggint){
 			$val=xml_call('MassenTableHandler.getRows',
 					array(new xmlrpcval($ids[0],'int'),
@@ -375,17 +394,7 @@ function getSeries($ids,$aggfunc,$aggint,$timefilter,$filter_arg){
 				$pos+=9;
 				$i++;
 			}
-		} else {
-			$val=xml_call('AggregationTableHandler.getRows',
-					array(new xmlrpcval($ids[0],'int'),
-							$timefilter,
-							$filter_arg));
-			$val=$val[1];
-			for($j=0;$j<count($val);$j++){
-				$res['datetime'][$j]=$val[$j][0]->timestamp-3600;
-				$res[0][$j]=$val[$j][1];
-			}
-		}
+		} 
 	} else {
 		if(!$aggfunc || !$aggint){
 			$func='MassenTableHandler.getMatrix';

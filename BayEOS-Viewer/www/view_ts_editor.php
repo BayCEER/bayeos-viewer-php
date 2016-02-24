@@ -7,6 +7,7 @@ $objekt=xml_call('ObjektHandler.getObjekt',
 		array(new xmlrpcval($_GET['edit'],'int'),
 				new xmlrpcval($node[4],'string')));
 $step=10;
+if(! $objekt[22]) $objekt[22]=600;
 
 if(isset($_POST['from'])){
 	set_post_from_until($_POST['interval']);

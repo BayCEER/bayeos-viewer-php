@@ -1,7 +1,34 @@
-<?php if(! isset($_GET['search'])) $_GET['search']='';?>
+<?php 
+if(isset($_GET['id']) && is_numeric($_GET['id']) && isset($_GET['search'])) unset($_GET['search']);
+if(! isset($_GET['search'])) $_GET['search']='';
+
+if($_SESSION['current_tree']=='Folders') $art_filter='messung_%';
+else $art_filter=$GLOBALS['bayeos_tree_unames'][$_SESSION['current_tree']];
+
+?>
 <form accept-charset="UTF-8">
-	<input name="search"
-		value="<?php echo htmlentities($_GET['search']);?>"> IN 
+<?php 
+
+?>
+		<input id="search" name="search" value="<?php echo htmlentities($_GET['search']);?>">
+			<input id="id" name="id" type="hidden">
+			<script type="text/javascript">
+			$('#search').autocomplete({source: function(request, response) {
+			$.getJSON("search.php", { search: request.term,refclass : '<?php echo $art_filter;?>',depth : 0, parent : <?php echo $_SESSION['id'];?>},
+			response);
+	},
+	select: function(event,ui){
+	$('#id').val(ui.item.id);
+	},
+	change: function(event, ui) {
+	if(! ui.item){
+
+	$('#id').val('');
+	}
+	},mustMatch: false,
+	minLength: 1});
+	</script>	<!--<input name="search"
+		value="<?php echo htmlentities($_GET['search']);?>">--> IN 
 	<select name="stype">
 	<option value="0">folder</option>
 	<option value="1"<?php if($_GET['stype']==1) echo " selected";?>>subfolders</option>
@@ -14,8 +41,6 @@
 <?php 	
 if(isset($_GET['search']) && $_GET['search'] && $_GET['stype']<2){
 	$qs='&search='.urlencode($_GET['search']).'&stype='.$_GET['stype'];
-	if($_SESSION['current_tree']=='Folders') $art_filter='messung_%';
-	else $art_filter=$GLOBALS['bayeos_tree_unames'][$_SESSION['current_tree']];
 	$search=xml_call('TreeHandler.getAllChildren',
 			array(new xmlrpcval($_SESSION['id'],'int'),
 					new xmlrpcval(false,'boolean'),

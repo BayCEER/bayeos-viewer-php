@@ -13,6 +13,7 @@ if(! isset($_SESSION['bayeosauth'])){
 	exit();
 }
 
+
 $return=array();
 if($_GET['refclass']=='acl'){
 	$return=getUserGroups($_GET['search']);
@@ -20,15 +21,24 @@ if($_GET['refclass']=='acl'){
 	$return=getUserGroups($_GET['search'],'Gruppen');
 } elseif($_GET['refclass']){
 	$path='/';
-	$parent=get_root_id($_GET['refclass']);
+	//THIS is a hack!!
+	if($_GET['refclass']=='messung_%') $parent=get_root_id('messung_ordner');
+	else $parent=get_root_id($_GET['refclass']);
+
 	if(substr($_GET['search'],0,1)=='/'){
 		$tmp=explode('/',$_GET['search']);
 		$search_prefix='';
 		$depth=0;
 	} else {
-		$tmp=array('',$_GET['search']);
+		$tmp=explode('/','/'.$_GET['search']);
 		$search_prefix='**/';
-		$depth=-1;
+		$depth=(is_numeric($_GET['depth'])?$_GET['depth']:-1);
+		if(is_numeric($_GET['parent'])){
+			$parent=$_GET['parent'];
+			$path='';
+			$search_prefix='';
+			$depth=0;
+		}
 	}
 	for($i=1;$i<count($tmp);$i++){
 		$res=xml_call('TreeHandler.getAllChildren',

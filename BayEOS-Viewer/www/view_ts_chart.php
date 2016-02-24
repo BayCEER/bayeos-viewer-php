@@ -14,6 +14,7 @@ if(isset($_POST['from'])){
 
 $res=$objekt[22];
 if(! $res) $res=600;
+
 $max=2000;
 $resByID=array();
 $indexByID=array();
@@ -34,7 +35,7 @@ while(($interval/$res)>$max && $i<(count($_SESSION['AgrIntervalle'])-1)){
 	$res=$_SESSION['AgrIntervalle'][$i][2];
 }
 if($i>0){
-	$agrint=$_SESSION['AgrIntervalle'][$GLOBALS['indexByID'][$i]][0];
+	$agrint=$_SESSION['AgrIntervalle'][$i][0];
 	$agrfunc=1;
 }
 ?>
@@ -102,7 +103,6 @@ else $filter_arg=xmlrpc_array(array($agrfunc,$agrint),'int');
 $data=getSeries(array($_GET['edit']), $agrfunc, $agrint, 
 		xmlrpc_array(array(toios8601FromEpoch($from),toios8601FromEpoch($until)),'dateTime.iso8601'),
 		$filter_arg);
-
 echo "{ data: [";
 $comma=0;
 for($j=0;$j<count($data['datetime']);$j++){
