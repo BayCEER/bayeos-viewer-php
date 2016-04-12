@@ -25,6 +25,17 @@ if(isset($_SESSION['dbConnection'])){
 		$res=DBQueryParams('select drop_user($1)', array($_GET['del']));
 		if($res)
 			add_alert('User deleted');
+	} elseif(isset($_POST['newclass']) && $_POST['newclass']){
+		$res=DBQueryParams('insert into zugriff(id_obj,id_benutzer,exec) select $2,id,true from benutzer where login=$1',
+				 array($_POST['edit'],$_POST['newclass']));
+		if($res)
+			add_alert('Create right on class granted');
+	} elseif(isset($_GET['_classdel'])){
+		$res=DBQueryParams('delete from zugriff where id_obj=$2 and id_benutzer=(select id from benutzer where login=$1)',
+				 array($_GET['edit'],$_GET['_classdel']));
+		if($res)
+			add_alert('Create right on class revoked');
+		
 	} elseif(isset($_POST['newrole']) && $_POST['newrole']){
 		$res=DBQueryParams('select grant_role($1,$2)', array($_POST['edit'],$_POST['newrole_dp']));
 		if($res)

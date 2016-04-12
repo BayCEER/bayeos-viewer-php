@@ -15,19 +15,19 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 <link rel="stylesheet" href="<?php echo $config['customBootstrapHome'];?>css/bootstrap.min.css">
 <link rel="stylesheet" href="js/rickshaw.min.css">
 <link rel="stylesheet" href="css/main.css">
-<script type="text/javascript" src="js/jstz.min.js"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery/jquery.min.js"></script>
-<script type="text/javascript"
-	src="/javascript/jquery-ui/jquery-ui.min.js"></script>
+<script src="js/jstz.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="/javascript/jquery/jquery.min.js"></script>
+<script	src="/javascript/jquery-ui/jquery-ui.min.js"></script>
 <link rel="stylesheet"
 	href="/javascript/jquery-ui/css/smoothness/jquery-ui.min.css">
-<script type="text/javascript" src="js/jquery.datetimeentry.pack.js"></script>
+<script src="js/jquery.datetimeentry.pack.js"></script>
 <!-- <script type="text/javascript"
 	src="/javascript/jquery-ui/jquery.mousewheel.js"></script>-->
 <style type="text/css">
 @import "js/jquery.datetimeentry.css";
 </style>
+<script src="js/clipboard.min.js"></script>
 
 
 </head>

@@ -7,7 +7,7 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 1.0.12
+Version: 1.0.16
 Postinst: apache_reload
 Postrm: apache_reload
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
@@ -47,6 +47,7 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/fonts/glyphicons-halflings-regular.woff /usr/share/bayeos-viewer-php/
  www/fonts/glyphicons-halflings-regular.ttf /usr/share/bayeos-viewer-php/
  www/fonts/glyphicons-halflings-regular.svg /usr/share/bayeos-viewer-php/
+ www/js/clipboard.min.js /usr/share/bayeos-viewer-php/
  www/js/jstz.min.js /usr/share/bayeos-viewer-php/
  www/js/rickshaw.min.js /usr/share/bayeos-viewer-php/
  www/js/d3.min.js /usr/share/bayeos-viewer-php/

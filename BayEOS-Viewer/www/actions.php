@@ -179,6 +179,7 @@ if($_REQUEST['action']=='settings_clipboard' && $_POST['save_as']){
 	ksort($_SESSION['cb_saved']);
 	updateCookies();
 	add_alert('Clipboard saved as '.$_POST['save_as']);
+	$_SESSION['current_clipboard']=$_POST['save_as'];
 }
 
 /***********************************************************
@@ -192,6 +193,7 @@ if(isset($_GET['cb_load'])){
 			addToClipboard($_SESSION['cb_saved'][$_GET['cb_load']][$i],0);
 		}
 	}
+	$_SESSION['current_clipboard']=$_GET['cb_load'];
 }
 
 //Clipboard add
@@ -223,8 +225,10 @@ if(isset($_GET['add']) && is_numeric($_GET['add'])){
 
 //Clipboard remove
 if(isset($_GET['remove'])){
-	if($_GET['remove']=='all')
+	if($_GET['remove']=='all'){
 		$_SESSION['clipboard']=array();
+		$_SESSION['current_clipboard']='';
+	}
 	elseif(is_numeric($_GET['remove'])){
 		$tmp=$_SESSION['clipboard'];
 		$_SESSION['clipboard']=array();

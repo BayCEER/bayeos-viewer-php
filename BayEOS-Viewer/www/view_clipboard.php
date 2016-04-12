@@ -15,14 +15,20 @@ else {
 <div class="row">
 <input type="hidden" name="action" value="settings_clipboard">
 <div class="col-sm-12"><div class="form-group ">
-<div class="btn-group">
+<div class="input-group">
+<div class="btn-group input-group-btn">
 <?php echo_saved_cb_dropdown(); ?>
 </div>
-<input name="save_as">
+<input  class="form-control" name="save_as" value="<?php echo htmlspecialchars($_SESSION['current_clipboard']);?>">
+<span class="input-group-btn">
 <button class="btn btn-primary" type="submit">
-<span class="glyphicon glyphicon-ok"></span> Save</button> 
+<span class="glyphicon glyphicon-ok"></span> Save</button>
+</span> 
+</div>
+<?php if(! $_SESSION['cb2db']){?>
 Note: Settings will get stored in cookies. 
 If you did not enable cookies settings will only be valid until logout.
+<?php }?>
 </div>
 </div>
 </div>

@@ -19,6 +19,18 @@ if($_GET['refclass']=='acl'){
 	$return=getUserGroups($_GET['search']);
 } elseif($_GET['refclass']=='roles'){
 	$return=getUserGroups($_GET['search'],'Gruppen');
+} elseif($_GET['refclass']=='classes'){
+	$res=DBQueryParams('select a.id,a.en||\' (\'||a.uname||\')\' from art_objekt a, objekt o
+			where a.id=o.id and a.en ilike $1||\'%\'
+			order by 2', array($_GET['search']));
+	$return=array();
+	for($i=0;$i<pg_num_rows($res);$i++){
+		$r=pg_fetch_array($res,$i);
+		$return[]=array('label'=>$r[1],'value'=>$r[1],'id'=>$r[0]);
+	}
+	
+	
+	
 } elseif($_GET['refclass']){
 	$path='/';
 	//THIS is a hack!!

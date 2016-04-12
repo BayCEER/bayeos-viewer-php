@@ -29,7 +29,7 @@ for($i=0;$i<count($tabs);$i++){
 <input type="hidden" name="action" value="user">
 <div class="block">
 <div class="block-header">
-<?php echo (isset($_GET['edit'])?'Change '.$name.' '.$_GET['edit']:'New '.$name);?>
+<?php echo (isset($_GET['edit'])?'Change '.$name.' <i>&quot;'.$_GET['edit'].'&quot;</i>':'New '.$name);?>
 </div>
 <div class="row">
 <?php 
@@ -72,38 +72,86 @@ if($_GET['view']==''){
 }
 if(isset($_GET['edit'])){
 	echo '</div>
-	</div>
+	</div>';
+	if(! $r[0]){
+		echo '
+		<div class="block">
+		<div class="block-header">Create rights:</div>
+		<div class="row">';	
+		$res=DBQueryParams('select a.id,a.en||\' (\'||a.uname||\')\' from art_objekt a, objekt o
+			where a.id=o.id	order by 2', array());
+		
+		
+		echo '<div class="input-group" style="max-width: 700px;">
+		<select class="form-control" name="newclass"><option value="">&nbsp;</option>';
+		for($i=0;$i<pg_num_rows($res);$i++){
+			$r=pg_fetch_row($res,$i);
+			echo '<option value="'.$r[0].'">'.$r[1].'</option>';	
+		}
+		echo '</select>
+				<span class="input-group-btn">
+				<button class="btn btn-default" name="_classadd">
+				<span class="glyphicon glyphicon-plus"></span> Add
+				</button>
+				</span>
+				</div>
+				';
+		$res=DBQueryParams('select a.id,a.en from art_objekt a, objekt o, zugriff z, benutzer b 
+				where a.id=o.id and z.id_obj=o.id and z.id_benutzer=b.id and b.login=$1 and z.exec
+				order by 2', array($_GET['edit']));
+		if(pg_num_rows($res)){
+		?>
+			<table class="table table-hover col-sm-12" style="max-width: 700px;">
+				<tbody>
+					<?php
+					for($i=0;$i<pg_num_rows($res);$i++){
+						$r=pg_fetch_array($res,$i);
+						echo '<tr>
+						<td style="width:100%"><span class="glyphicon glyphicon-new-window"></span> '.$r[1].'</td>
+						<td><a href="./?action=user&edit='.$_GET['edit'].'&_classdel='.urlencode($r[0]).'" class="btn btn-xs btn-default" onClick="return confirm(\'Are you sure?\');">
+						<span class="glyphicon glyphicon-remove"></span> delete</a></td>';
+						echo '</tr>
+						';
+					}
+					?>
+				</tbody>
+			</table>
+		<?php 	
+		}	
+		
+				
+		echo '</div>
+		</div>';
+	}
+	echo '
 	<div class="block">
-<div class="block-header">Granted Roles</div>
+<div class="block-header">Granted Roles:</div>
 <div class="row">
 	';
-	$res=DBQueryParams('select g.login from benutzer g, benutzer_gr bg, benutzer b
-			where g.id=bg.id_gruppe and b.id=bg.id_benutzer and b.login=$1', array($_GET['edit']));
-	?>
-	<table class="table table-hover col-sm-12">
-		<thead>
-			<tr>
-				<th>Roles</th>
-			</tr>
-		</thead>
-		<tbody>
-			<?php
-			echo '<tr>
-				<td>
-				'.get_input("newrole",'autocomplete','','',array('refclass'=> "'roles'",
+			echo '<div class="input-group" style="max-width: 700px;">
+				'.get_input("newrole",'autocomplete','','form-control',array('refclass'=> "'roles'",
 						'additional_args'=>'mustMatch: true,')).'
-						</td>
-						<td><button class="btn btn-xs btn-default" name="_roleadd">
+						
+						<span class="input-group-btn">
+						<button class="btn btn-default" name="_roleadd">
 						<span class="glyphicon glyphicon-plus"></span> Add
 						</button>
-						</tr>
+						</span>
+						</div>
 						';
+	$res=DBQueryParams('select g.login from benutzer g, benutzer_gr bg, benutzer b
+			where g.id=bg.id_gruppe and b.id=bg.id_benutzer and b.login=$1', array($_GET['edit']));
+	if(pg_num_rows($res)){
+	?>
+	<table class="table table-hover col-sm-12" style="max-width: 700px;">
+		<tbody>
+			<?php
 			
 	
 			for($i=0;$i<pg_num_rows($res);$i++){
 				$r=pg_fetch_array($res,$i);
 				echo '<tr>
-				<td><span class="glyphicon glyphicon-list"></span> '.$r[0].'</td>
+				<td style="width:100%"><span class="glyphicon glyphicon-list"></span> '.$r[0].'</td>
 				<td><a href="./?action=user&edit='.$_GET['edit'].'&_roledel='.urlencode($r[0]).'" class="btn btn-xs btn-default" onClick="return confirm(\'Are you sure?\');">
 				<span class="glyphicon glyphicon-remove"></span> delete</a></td>';
 				echo '</tr>
@@ -112,7 +160,8 @@ if(isset($_GET['edit'])){
 			?>
 		</tbody>
 	</table>
-<?php 		
+<?php 
+	}		
 }
 
 ?>	

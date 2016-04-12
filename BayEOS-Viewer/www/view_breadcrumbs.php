@@ -53,15 +53,27 @@ if(! $found){
 $i=0;
 echo '<ol class="breadcrumb">';
 $_SESSION['currentpath']='';
+$cb_path='';
 while($i<count($_SESSION['breadcrumbs'])){
 	$_SESSION['currentpath'].='/'.$_SESSION['breadcrumbs'][$i][5];
 	if($_SESSION['breadcrumbs'][$i][2]==$_SESSION['id'])
 		echo '<li class="active">'.$_SESSION['breadcrumbs'][$i][5].'</li>';
 	else
 		echo '<li><a href="?id='.$_SESSION['breadcrumbs'][$i][2].'">'.$_SESSION['breadcrumbs'][$i][5].'</a></li>';
+	if($i>0) $cb_path.='/'.$_SESSION['breadcrumbs'][$i][5];
 	$i++;
 }
-echo '</ol>';
+if($cb_path) 
+	echo '
+<button id="cb-btn" class="pull-right btn btn-xs btn-default" data-clipboard-text="'.$cb_path.'" title="copy path to clipboard">
+<span class="glyphicon glyphicon-copy"></span> <span class="hidden-xs">Copy path</span>
+</button>
+<script>
+new Clipboard(document.getElementById(\'cb-btn\'));
+</script>
 
+';
+echo '</ol>
+';
 
 ?>

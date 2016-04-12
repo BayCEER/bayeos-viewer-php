@@ -10,7 +10,8 @@ else $art_filter=$GLOBALS['bayeos_tree_unames'][$_SESSION['current_tree']];
 <?php 
 
 ?>
-		<input id="search" name="search" value="<?php echo htmlentities($_GET['search']);?>">
+<div class="input-group" style="max-width: 800px;">
+		<input id="search" name="search" value="<?php echo htmlentities($_GET['search']);?>" class="form-control">
 			<input id="id" name="id" type="hidden">
 			<script type="text/javascript">
 			$('#search').autocomplete({source: function(request, response) {
@@ -28,15 +29,18 @@ else $art_filter=$GLOBALS['bayeos_tree_unames'][$_SESSION['current_tree']];
 	},mustMatch: false,
 	minLength: 1});
 	</script>	<!--<input name="search"
-		value="<?php echo htmlentities($_GET['search']);?>">--> IN 
-	<select name="stype">
+		value="<?php echo htmlentities($_GET['search']);?>">--><span class="input-group-addon">IN</span>
+	<select name="stype" class="form-control">
 	<option value="0">folder</option>
 	<option value="1"<?php if($_GET['stype']==1) echo " selected";?>>subfolders</option>
 	<option value="2"<?php if($_GET['stype']==2) echo " selected";?>>ID</option>
-	</select>
-	<button type="submit" class="btn btn-primary">
-		<span class="glyphicon glyphicon-search"></span> Search
+	</select> 
+	<span class="input-group-btn">
+	<button type="submit" class="btn btn-default">
+		<span class="glyphicon glyphicon-search"></span> <span class="hidden-xs">Search</span>
 	</button>
+	</span>
+	</div>
 </form>
 <?php 	
 if(isset($_GET['search']) && $_GET['search'] && $_GET['stype']<2){
