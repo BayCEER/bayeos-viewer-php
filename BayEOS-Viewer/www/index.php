@@ -60,7 +60,7 @@ switch ($_SESSION['tab']){
 		
 	default:
 		require 'view_breadcrumbs.php';
-		if(isset($_GET['edit']))
+		if(isset($_GET['edit'])) //note view_breadcrumbs.php will set $_GET['edit'] in some cases!
 			require 'view_object.php';
 		else
 			require 'view_childs.php';

@@ -10,7 +10,7 @@ if(isset($_POST['_action_remove']) && is_numeric($_GET['edit'])){
 		add_alert('Node '.$_GET['edit'].' deleted');
 		unset($_GET['edit']);
 	}
-	$_GET['id']=$node[3];
+	$_GET['id']=$node[3]; //move to parent!
 }
 
 //Move Node - Find root node
@@ -81,9 +81,15 @@ if(isset($_GET['edit']) && is_numeric($_GET['edit']) && isset($_POST["t5"])){
 						new xmlrpcval($values,'array')));
 		if($res)
 			add_alert('Object updated');
+		
 	}
 
 }
 
+//Redirects for data column:
+if(isset($node) && $node[4]=='data_column'){
+	$_GET['edit']=$node[3];
+	$_GET['view']='df_editor';
+}
 
 ?>

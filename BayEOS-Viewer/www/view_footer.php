@@ -7,7 +7,7 @@
 	<p class="text-muted credit">
 		© 2014-2016 <a href="http://www.uni-bayreuth.de/">University of Bayreuth,</a>
 		<a href="http://www.bayceer.uni-bayreuth.de/">BayCEER</a> Release
-		1.0.16 - Fabulous icons from <a href="http://glyphicons.com">Glyphicons
+		1.0.17 - Fabulous icons from <a href="http://glyphicons.com">Glyphicons
 			Free</a>, licensed under <a
 			href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>
 	</p>

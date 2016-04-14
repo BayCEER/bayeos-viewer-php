@@ -342,8 +342,7 @@ function echo_table($childs,$action="add",$qs=''){
 		for($i=0;$i<count($childs);$i++){
 			echo '<tr><td>
 			<span class="glyphicon glyphicon-'.$GLOBALS['uname_icon_hash'][$childs[$i][4]].'">
-			</span> '.(isset($GLOBALS['bayeos_canhavechilds'][$childs[$i][4]])?
-					'<a href="?id='.$childs[$i][2].(strstr($childs[$i][4],'messung_')?'&tab=Folders':'').'">'.$childs[$i][5].'</a>':$childs[$i][5]).'
+			</span> <a href="?id='.$childs[$i][2].(strstr($childs[$i][4],'messung_')?'&tab=Folders':'').'">'.$childs[$i][5].'</a>
 					</td>
 					'.($with_path?'<td class="hidden-xs">
 			<a href="?tab=Folders&id='.$childs[$i]['path'][0].'">'.get_path($childs[$i]['path'][1],40).'</a>

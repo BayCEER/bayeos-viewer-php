@@ -3,16 +3,16 @@
 if(isset($_GET['search']) && is_numeric($_GET['search']) && $_GET['stype']==2){
 	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['search'],'int')));
 	if($node){
-		if($node['4']=='messung_massendaten') $_GET['edit']=$node[2];
+		if(! isset($GLOBALS['bayeos_canhavechilds'][$node[4]]) || $node[4]=='data_frame')
+			 $_GET['edit']=$node[2];
 		else $_GET['id']=$node[2];
 	}
 }
 //Search via autocomplete
 if(isset($_GET['id']) && is_numeric($_GET['id'])){
 	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['id'],'int')));
-	if($node && $node['4']=='messung_massendaten'){
+	if($node && (! isset($GLOBALS['bayeos_canhavechilds'][$node[4]])||$node[4]=='data_frame')){
 		$_GET['edit']=$node[2];
-		unset($_GET['id']);
 	}
 }
 
@@ -66,13 +66,19 @@ while($i<count($_SESSION['breadcrumbs'])){
 if($cb_path) 
 	echo '
 <button id="cb-btn" class="pull-right btn btn-xs btn-default" data-clipboard-text="'.$cb_path.'" title="copy path to clipboard">
-<span class="glyphicon glyphicon-copy"></span> <span class="hidden-xs">Copy path</span>
+<span class="glyphicon glyphicon-copy"></span> <span class="hidden-xs">Copy </span>Path
 </button>
 <script>
 new Clipboard(document.getElementById(\'cb-btn\'));
 </script>
+	<button id="cb-btn-id" class="pull-right btn btn-xs btn-default" data-clipboard-text="'.$_SESSION['id'].'" title="copy ID to clipboard">
+	<span class="glyphicon glyphicon-copy"></span> <span class="hidden-xs">Copy </span>ID
+	</button>
+	<script>
+	new Clipboard(document.getElementById(\'cb-btn-id\'));
+	</script>
+	';
 
-';
 echo '</ol>
 ';
 
