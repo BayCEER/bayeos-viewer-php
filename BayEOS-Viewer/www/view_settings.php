@@ -1,4 +1,4 @@
-<form method="POST" class="form" role="form">
+<form method="POST" class="form" role="form" action="?action=settings">
 <div class="block">
 <div class="block-header">Chart settings - Larger values may slow down plotting!</div>
 <div class="row">
@@ -7,17 +7,18 @@
 echo_field("max_cols",'Maximum number of series','INT',$_SESSION['max_cols'],3);
 echo_field("max_rows",'Maximum number of datapoints','INT',$_SESSION['max_rows'],3);
 echo_field("gnuplot",'Render plot as image (Check if normal chart plotting does not work on your device)','boolean',$_SESSION['gnuplot'],3);
-echo_field("cb2db",'Save clipboards on server','boolean',$_SESSION['cb2db'],3);
+echo_field("cb2db",'Save clipboards and bookmarks on server','boolean',$_SESSION['cb2db'],3);
 ?>
 </div>
 </div>
+
 <div class="block">
 <div class="block-header">Saved Clipboards</div>
 <div class="row">
 <table class="table table-hover col-sm-6">
 <?php 
 while(list($key)=each($_SESSION['cb_saved'])){
-	echo '<tr><td>'.$key.'<td>
+	echo '<tr><td>'.get_input('cb_key[]','hidden',$key).get_input('cb_key_new[]','',$key).'<td>
 	<a href="?cb_load='.urlencode($key).'&tab=Clipboard" class="btn btn-xs btn-default">
 	<span class="glyphicon glyphicon-upload"></span> load</a>
 	
@@ -30,10 +31,32 @@ reset($_SESSION['cb_saved']);
 </table>
 </div>
 </div>
+
+<div class="block">
+<div class="block-header">Bookmarks</div>
+<div class="row">
+<table class="table table-hover col-sm-6">
+<?php 
+reset($_SESSION['bookmarks']);
+if(! isset($_GET['id'])) $_GET['id']=0;
+while(list($key,$value)=each($_SESSION['bookmarks'])){
+	echo '<tr'.($_GET['id']==$value?' class="success"':'').'><td>'.get_input('bm_key[]','hidden',$key).get_input('bm_key_new[]','',$key).'<td>
+	<a href="?bm_del='.urlencode($key).'" 
+	class="btn btn-xs btn-default" onClick="return confirm(\'Are you sure?\');">
+			<span class="glyphicon glyphicon-remove"></span> delete</a><td></td></tr>'."\n";
+}
+//$_SESSION['bookmarks']=$tmp;
+reset($_SESSION['bookmarks']);
+?>
+</table>
+</div>
+</div>
+
+
 <div class="block-action">
 <button class="btn btn-primary" type="submit">
 <span class="glyphicon glyphicon-ok"></span> Update</button> 
 </div>
 </form>
-Note: Settings will get stored in cookies. 
+Note: <?php if($_SESSION['cb2db']) echo 'Some ';?>settings will get stored in cookies. 
 If you did not enable cookies settings will only be valid until logout.

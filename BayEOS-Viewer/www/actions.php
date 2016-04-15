@@ -162,10 +162,38 @@ if(isset($_GET['cb_del']) && isset($_SESSION['cb_saved'][$_GET['cb_del']])){
 	add_alert('Deleted saved clipboard');
 }
 
+if(isset($_GET['bm_del']) && isset($_SESSION['bookmarks'][$_GET['bm_del']])){
+	unset($_SESSION['bookmarks'][$_GET['bm_del']]);
+	updateCookies();
+	add_alert('Deleted bookmark '.$_GET['bm_del']);
+}
+
 if($_REQUEST['action']=='settings'){
 	$_SESSION['max_cols']=$_POST['max_cols'];
 	$_SESSION['max_rows']=$_POST['max_rows'];
 	$_SESSION['gnuplot']=$_POST['gnuplot'];
+	if(is_array($_POST['cb_key'])){
+		for($i=0;$i<count($_POST['cb_key']);$i++){
+			if($_POST['cb_key'][$i]!=$_POST['cb_key_new'][$i]){
+				$value=$_SESSION['cb_saved'][$_POST['cb_key'][$i]];
+				unset($_SESSION['cb_saved'][$_POST['cb_key'][$i]]);
+				$_SESSION['cb_saved'][$_POST['cb_key_new'][$i]]=$value;
+			}
+			
+		}
+	}
+	ksort($_SESSION['bookmarks']);
+	if(is_array($_POST['bm_key'])){
+		for($i=0;$i<count($_POST['bm_key']);$i++){
+			if($_POST['bm_key'][$i]!=$_POST['bm_key_new'][$i]){
+				$value=$_SESSION['bookmarks'][$_POST['bm_key'][$i]];
+				unset($_SESSION['bookmarks'][$_POST['bm_key'][$i]]);
+				$_SESSION['bookmarks'][$_POST['bm_key_new'][$i]]=$value;
+			}
+			
+		}
+	}
+	ksort($_SESSION['bookmarks']);
 	updateCookies();
 	add_alert('Settings saved');
 	
@@ -279,5 +307,41 @@ if(isset($_GET['interpolate'])) $_SESSION['interpolate']=$_GET['interpolate'];
 	$_SESSION['chartdata']=0;
 }*/
 
+//set home
+if(isset($_GET['action']) && $_GET['action']=='sethome'){
+	if($_SESSION['cb2db'])
+		xml_call('PreferenceHandler.setPreference',
+		array(new xmlrpcval('bayeosviewer','string'),
+				new xmlrpcval('homefolder','string'),
+				new xmlrpcval($_GET['id'],'string')));
+	else 
+		setcookie('homefolder',$_GET['id'],time()+3600*24*180);
+		
+	$_SESSION['homefolder']=$_GET['id'];
+	add_alert('New homefolder saved. You can jump to your home folder by clicking on BayEOS Server on the top left.');
+	
+}
+
+//set bookmark
+if(isset($_GET['action']) && $_GET['action']=='setbookmark'){
+	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['id'],'int')));
+	if(in_array($_GET['id'],$_SESSION['bookmarks'])){
+		add_alert('&quot;'.$node[5].'&quot; is already in your bookmarks','warning');
+		unset($_GET['action']);
+	}
+}
+if(isset($_GET['action']) && $_GET['action']=='setbookmark'){
+	$c=1;
+	$name=$node[5];
+	while(isset($_SESSION['bookmarks'][$name])){
+		$name=$node[5].'_'.$c;
+		$c++;
+	}
+	$_SESSION['bookmarks'][$name]=$_GET['id'];
+	ksort($_SESSION['bookmarks']);
+	updateCookies();
+	add_alert('Added folder to your bookmarks');
+
+}
 
 ?>

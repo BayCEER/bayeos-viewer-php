@@ -21,7 +21,7 @@ function get_path($path,$max=30){
 
 function echo_button($name,$icon,$url='',$class='btn btn-default',$button_attr=''){
 	echo "\n";
-	if($url) echo '<a href="'.$url.'" class="'.$class.'" >';
+	if($url) echo '<a href="'.$url.'" class="'.$class.'">';
 	else echo '<button class="'.$class.'" '.$button_attr.'>';
 	echo '<span class="glyphicon glyphicon-'.$icon.'"></span> <span class="hidden-xs">'.$name.'</span>';
 	if($url) echo '</a>';

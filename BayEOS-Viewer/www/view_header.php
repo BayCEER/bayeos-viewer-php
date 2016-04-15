@@ -47,9 +47,11 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 							class="icon-bar"></span> <span class="icon-bar"></span> <span
 							class="icon-bar"></span>
 					</button>
-				<?php }?>
+				<?php }
+				$HOMELINK="./?tab=Folders".(isset($_SESSION['homefolder'])?'&id='.$_SESSION['homefolder']:'');
+				?>
 
-					<a href="./" class="navbar-brand"><strong>BayEOS</strong> Server</a>
+					<a href="<?php echo $HOMELINK;?>" class="navbar-brand"><strong>BayEOS</strong> Server</a>
 				</div>
 				<div class="collapse navbar-collapse navbar-ex1-collapse">
 					<?php if(isset($_SESSION['bayeosauth'])){?>
@@ -74,6 +76,12 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 							$nav['Admin']['dropdown']['Authentication']=array('icon'=>'cog');
 							$nav['Admin']['dropdown']['User/Roles']=array('icon'=>'user');
 						}
+						if(count($_SESSION['bookmarks'])){
+							$nav['Bookmarks']['icon']='tag';
+							while(list($key,$value)=each($_SESSION['bookmarks'])){
+								$nav['Bookmarks']['dropdown'][$key]=array('url'=>'?tab=Folders&id='.$value);
+							}
+						}
 						
 						while(list($key,$value)=each($nav)){
 							if(isset($value['dropdown'])){
@@ -86,12 +94,14 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 								while(list($key2,$value2)=each($value['dropdown'])){
 									if(strstr($key2,'sep'))
 										echo '<li class="divider"></li>';
-									else 
+									else { 
+										if(isset($value2['url'])) $url=$value2['url'];
+										else $url='./?tab='.urlencode($key2);
 										echo '
 									<li'.($key2==$_SESSION['tab']?' class="active"':'').'>
-									<a href="./?tab='.urlencode($key2).'"><span class="glyphicon glyphicon-'.$value2['icon'].'"></span> '.$key2.'</a>
+									<a href="'.$url.'"><span class="glyphicon glyphicon-'.$value2['icon'].'"></span> '.$key2.'</a>
 									</li>';
-
+									}
 								}
 								echo '</ul>
 								</li>';

@@ -50,6 +50,15 @@ if($res===false) {
 	$pref=xml_call('PreferenceHandler.getPreferences',array(new xmlrpcval('bayeosviewer','string')));
 	if(isset($_COOKIE['cb_saved'])) $_SESSION['cb_saved']=unserialize($_COOKIE['cb_saved']);
 	if(isset($pref['cb_saved'])) $_SESSION['cb_saved']=array_merge($_SESSION['cb_saved'],unserialize($pref['cb_saved']));
+	//Homefolder
+	if(isset($pref['homefolder']))	$_SESSION['homefolder']=$pref['homefolder'];
+	elseif(isset($_COOKIE['homefolder'])) $_SESSION['homefolder']=$_COOKIE['homefolder'];
+	if(isset($_SESSION['homefolder'])) $_GET['id']=$_SESSION['homefolder'];
+	//Bookmarks
+	if(isset($pref['bookmarks'])) $_SESSION['bookmarks']=unserialize($pref['bookmarks']);
+	elseif(isset($_COOKIES['bookmarks'])) $_SESSION['bookmarks']=unserialize($_COOKIE['bookmarks']);
+	else $_SESSION['bookmarks']=array();
+	
 	unset($pref);
 	ksort($_SESSION['cb_saved']);
 	if(isset($_COOKIE['max_rows']) && is_numeric($_COOKIE['max_rows']))

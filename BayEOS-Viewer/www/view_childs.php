@@ -99,5 +99,8 @@ if( !$_SESSION['treefilter'])
 else
 	echo_button('Show inactive','plus',"?treefilter=0");
 echo_button('Details','edit','?edit='.$_SESSION['id']);
+echo_button('bookmark','tag','?tab=Settings&action=setbookmark&id='.$_SESSION['id']);
+if($_SESSION['id']!=$_SESSION['homefolder']) echo_button('Set as home folder','home','?action=sethome&id='.$_SESSION['id']);
+else echo_button('Home folder','home','?id='.$_SESSION['id'],'btn btn-primary');
 echo "\n".'</div></div>'."\n";
 ?>

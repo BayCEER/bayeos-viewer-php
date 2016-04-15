@@ -103,6 +103,13 @@ function updateCookies(){
 	}
 	else
 		setcookie('cb_saved',serialize($_SESSION['cb_saved']),time()+3600*24*180);
+	if($_SESSION['cb2db'])
+		xml_call('PreferenceHandler.setPreference',
+				array(new xmlrpcval('bayeosviewer','string'),
+						new xmlrpcval('bookmarks','string'),
+						new xmlrpcval(serialize($_SESSION['bookmarks']),'string')));
+	else
+		setcookie('homefolder',serialize($_SESSION['bookmarks']),time()+3600*24*180);
 }
 
 function get_object_fields($uname){
