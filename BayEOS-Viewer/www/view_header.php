@@ -77,7 +77,7 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 							$nav['Admin']['dropdown']['User/Roles']=array('icon'=>'user');
 						}
 						if(count($_SESSION['bookmarks'])){
-							$nav['Bookmarks']['icon']='tag';
+							$nav['Bookmarks']['icon']='bookmark';
 							while(list($key,$value)=each($_SESSION['bookmarks'])){
 								$nav['Bookmarks']['dropdown'][$key]=array('url'=>'?tab=Folders&id='.$value);
 							}
@@ -119,14 +119,13 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 					<div class="navbar-right">
 						<?php if(isset($_SESSION['bayeosauth'])){
 							?>
-						<p class="navbar-text">
-						<span class="hidden-sm">
-						Signed in as
+						<p class="navbar-text hidden-sm">
+ 						Signed in as
 							<?php echo $_SESSION['login'];?>
-						</span>
-							</p>
-						<a href="?action=logout">
-							<button type="button" class="btn btn-default navbar-btn">Logout</button>
+ 							</p>
+						<a href="?action=logout" class="btn btn-default navbar-btn" title="logout">
+							<span class="glyphicon glyphicon-log-out"></span> 
+							<span class="hidden-sm">Logout</span>
 						</a>
 						<?php }?>
 					</div>
