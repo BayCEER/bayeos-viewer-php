@@ -65,14 +65,15 @@ while($i<count($_SESSION['breadcrumbs'])){
 }
 if($cb_path) 
 	echo '
-<button id="cb-btn" class="pull-right btn btn-xs btn-default" data-clipboard-text="'.$cb_path.'" title="copy path to clipboard">
-<span class="glyphicon glyphicon-copy"></span> <span class="hidden-xs">Copy </span>Path
+	
+<button id="cb-btn" class="pull-right btn btn-xs btn-default hidden-xs" data-clipboard-text="'.$cb_path.'" title="copy path to clipboard">
+<span class="glyphicon glyphicon-copy"></span> <span class="hidden-sm">Copy </span>Path
 </button>
 <script>
 new Clipboard(document.getElementById(\'cb-btn\'));
 </script>
-	<button id="cb-btn-id" class="pull-right btn btn-xs btn-default" data-clipboard-text="'.$_SESSION['id'].'" title="copy ID to clipboard">
-	<span class="glyphicon glyphicon-copy"></span> <span class="hidden-xs">Copy </span>ID
+	<button id="cb-btn-id" class="pull-right btn btn-xs btn-default hidden-xs" data-clipboard-text="'.$_SESSION['id'].'" title="copy ID to clipboard">
+	<span class="glyphicon glyphicon-copy"></span> <span class="hidden-sm">Copy </span>ID
 	</button>
 	<script>
 	new Clipboard(document.getElementById(\'cb-btn-id\'));

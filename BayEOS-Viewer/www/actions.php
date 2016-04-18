@@ -156,44 +156,69 @@ if($_REQUEST['action']=='password'){
 /***********************************************************
  * Settings
 ***********************************************************/
+/*
 if(isset($_GET['cb_del']) && isset($_SESSION['cb_saved'][$_GET['cb_del']])){
 	unset($_SESSION['cb_saved'][$_GET['cb_del']]);
 	updateCookies();
 	add_alert('Deleted saved clipboard');
+	$_GET['stab']='clipboards';
 }
 
 if(isset($_GET['bm_del']) && isset($_SESSION['bookmarks'][$_GET['bm_del']])){
 	unset($_SESSION['bookmarks'][$_GET['bm_del']]);
 	updateCookies();
 	add_alert('Deleted bookmark '.$_GET['bm_del']);
+	$_GET['stab']='bookmarks';
 }
-
+*/
 if($_REQUEST['action']=='settings'){
-	$_SESSION['max_cols']=$_POST['max_cols'];
-	$_SESSION['max_rows']=$_POST['max_rows'];
-	$_SESSION['gnuplot']=$_POST['gnuplot'];
+	$keys=array('max_cols','max_rows','gnuplot','cb2db');
+	for($i=0;$i<count($keys);$i++){
+		if($_SESSION[$keys[$i]]!=$_POST[$keys[$i]]){
+			$_SESSION[$keys[$i]]=$_POST[$keys[$i]];
+			$_GET['stab']='chart';
+		}
+		
+	}
+	
 	if(is_array($_POST['cb_key'])){
 		for($i=0;$i<count($_POST['cb_key']);$i++){
 			if($_POST['cb_key'][$i]!=$_POST['cb_key_new'][$i]){
 				$value=$_SESSION['cb_saved'][$_POST['cb_key'][$i]];
 				unset($_SESSION['cb_saved'][$_POST['cb_key'][$i]]);
 				$_SESSION['cb_saved'][$_POST['cb_key_new'][$i]]=$value;
+				$_GET['stab']='clipboards';
 			}
-			
 		}
 	}
-	ksort($_SESSION['bookmarks']);
+	if(is_array($_POST['cb_del'])){
+		for($i=0;$i<count($_POST['cb_del']);$i++){
+			unset($_SESSION['cb_saved'][$_POST['cb_del'][$i]]);
+		}
+		$_GET['stab']='clipboards';
+	}
+	
+	
+	
 	if(is_array($_POST['bm_key'])){
 		for($i=0;$i<count($_POST['bm_key']);$i++){
 			if($_POST['bm_key'][$i]!=$_POST['bm_key_new'][$i]){
 				$value=$_SESSION['bookmarks'][$_POST['bm_key'][$i]];
 				unset($_SESSION['bookmarks'][$_POST['bm_key'][$i]]);
 				$_SESSION['bookmarks'][$_POST['bm_key_new'][$i]]=$value;
+				$_GET['stab']='bookmarks';
 			}
 			
 		}
 	}
+	if(is_array($_POST['bm_del'])){
+		for($i=0;$i<count($_POST['bm_del']);$i++){
+			unset($_SESSION['bookmarks'][$_POST['bm_del'][$i]]);
+		}
+		$_GET['stab']='bookmarks';
+	}
 	ksort($_SESSION['bookmarks']);
+	ksort($_SESSION['cb_saved']);
 	updateCookies();
 	add_alert('Settings saved');
 	
@@ -324,6 +349,7 @@ if(isset($_GET['action']) && $_GET['action']=='sethome'){
 
 //set bookmark
 if(isset($_GET['action']) && $_GET['action']=='setbookmark'){
+	$_GET['stab']='bookmarks';
 	$node=xml_call('TreeHandler.getNode',array(new xmlrpcval($_GET['id'],'int')));
 	if(in_array($_GET['id'],$_SESSION['bookmarks'])){
 		add_alert('&quot;'.$node[5].'&quot; is already in your bookmarks','warning');

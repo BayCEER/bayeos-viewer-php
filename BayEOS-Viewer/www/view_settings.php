@@ -1,6 +1,59 @@
+<?php 
+if(! isset($_GET['stab'])) $_GET['stab']='clipboards';
+?>
 <form method="POST" class="form" role="form" action="?action=settings">
 <div class="block">
-<div class="block-header">Chart settings - Larger values may slow down plotting!</div>
+<div class="block-header">Settings</div>
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+<li<?php if($_GET['stab']=='clipboards') echo ' class="active"';?>><a href="#clipboards" data-toggle="tab">Clipboards</a></li>
+<li<?php if($_GET['stab']=='bookmarks') echo ' class="active"';?>><a href="#bookmarks" data-toggle="tab">Bookmarks</a></li>
+<li<?php if($_GET['stab']=='chart') echo ' class="active"';?>><a href="#chart" data-toggle="tab">Miscellaneous</a></li>
+</ul>
+
+<div id="my-tab-content" class="tab-content">
+
+<div class="tab-pane<?php if($_GET['stab']=='clipboards') echo ' active';?>" id="clipboards">
+<div class="row">
+<table class="table table-hover col-sm-6">
+<?php 
+while(list($key)=each($_SESSION['cb_saved'])){
+	echo '<tr><td>'.get_input('cb_key[]','hidden',$key).get_input('cb_key_new[]','',$key).'<td>
+	<input type="checkbox" name="cb_del[]" value="'.urlencode($key).'" id="cb_del_'.urlencode($key).'">
+	<label for="cb_del_'.urlencode($key).'">delete</label> 
+	</td><td>
+	<a href="?cb_load='.urlencode($key).'&tab=Clipboard" class="btn btn-xs btn-default">
+	<span class="glyphicon glyphicon-upload"></span> load</a>
+	<td></td></tr>';
+}
+reset($_SESSION['cb_saved']);
+?>
+</table>
+</div>
+</div>
+
+<div class="tab-pane<?php if($_GET['stab']=='bookmarks') echo ' active';?>" id="bookmarks">
+<div class="row">
+<table class="table table-hover col-sm-6">
+<?php 
+reset($_SESSION['bookmarks']);
+if(! isset($_GET['id'])) $_GET['id']=0;
+while(list($key,$value)=each($_SESSION['bookmarks'])){
+	echo '<tr'.($_GET['id']==$value?' class="success"':'').'><td>'.get_input('bm_key[]','hidden',$key).get_input('bm_key_new[]','',$key).'<td>
+	<input type="checkbox" name="bm_del[]" value="'.urlencode($key).'" id="bm_del_'.urlencode($key).'">
+	<label for="bm_del_'.urlencode($key).'">delete</label> 
+	</td><td>
+	<a href="?id='.urlencode($value).'&tab=Folders" class="btn btn-xs btn-default">
+	<span class="glyphicon glyphicon-share-alt"></span> goto</a>
+	<td></td></tr>'."\n";
+}
+//$_SESSION['bookmarks']=$tmp;
+reset($_SESSION['bookmarks']);
+?>
+</table>
+</div>
+</div>
+
+<div class="tab-pane<?php if($_GET['stab']=='chart') echo ' active';?>" id="chart">
 <div class="row">
 <input type="hidden" name="action" value="settings">
 <?php
@@ -12,46 +65,9 @@ echo_field("cb2db",'Save clipboards and bookmarks on server','boolean',$_SESSION
 </div>
 </div>
 
-<div class="block">
-<div class="block-header">Saved Clipboards</div>
-<div class="row">
-<table class="table table-hover col-sm-6">
-<?php 
-while(list($key)=each($_SESSION['cb_saved'])){
-	echo '<tr><td>'.get_input('cb_key[]','hidden',$key).get_input('cb_key_new[]','',$key).'<td>
-	<a href="?cb_load='.urlencode($key).'&tab=Clipboard" class="btn btn-xs btn-default">
-	<span class="glyphicon glyphicon-upload"></span> load</a>
-	
-	<a href="?cb_del='.urlencode($key).'" 
-	class="btn btn-xs btn-default" onClick="return confirm(\'Are you sure?\');">
-			<span class="glyphicon glyphicon-remove"></span> delete</a><td></td></tr>';
-}
-reset($_SESSION['cb_saved']);
-?>
-</table>
-</div>
-</div>
 
-<div class="block">
-<div class="block-header">Bookmarks</div>
-<div class="row">
-<table class="table table-hover col-sm-6">
-<?php 
-reset($_SESSION['bookmarks']);
-if(! isset($_GET['id'])) $_GET['id']=0;
-while(list($key,$value)=each($_SESSION['bookmarks'])){
-	echo '<tr'.($_GET['id']==$value?' class="success"':'').'><td>'.get_input('bm_key[]','hidden',$key).get_input('bm_key_new[]','',$key).'<td>
-	<a href="?bm_del='.urlencode($key).'" 
-	class="btn btn-xs btn-default" onClick="return confirm(\'Are you sure?\');">
-			<span class="glyphicon glyphicon-remove"></span> delete</a><td></td></tr>'."\n";
-}
-//$_SESSION['bookmarks']=$tmp;
-reset($_SESSION['bookmarks']);
-?>
-</table>
 </div>
 </div>
-
 
 <div class="block-action">
 <button class="btn btn-primary" type="submit">
