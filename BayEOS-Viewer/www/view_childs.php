@@ -76,6 +76,7 @@ if(isset($_GET['search']) && $_GET['search'] && $_GET['stype']<2){
 							new xmlrpcval(null,'null'))
 			));
 }
+
 echo_table($childs,'add',$qs);
 //print_r($_SESSION);
 echo '

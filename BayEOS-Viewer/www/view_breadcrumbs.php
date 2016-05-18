@@ -1,3 +1,12 @@
+<style>
+.popover-content {
+   height: 140px;
+   overflow-y: scroll;
+}
+.popover{
+    max-width: 500px; /* Max Width of the popover (depending on the container!) */
+}
+</style>
 <?php 
 //ID-Search via User-Input
 if(isset($_GET['search']) && is_numeric($_GET['search']) && $_GET['stype']==2){
@@ -17,7 +26,7 @@ if(isset($_GET['id']) && is_numeric($_GET['id'])){
 }
 
 if(isset($_GET['edit']) && is_numeric($_GET['edit'])) $_GET['id']=$_GET['edit'];
-if(isset($_GET['id']) && is_numeric($_GET['id']))	$_SESSION['id']=$_GET['id'];
+if(isset($_GET['id']) && is_numeric($_GET['id'])) $_SESSION['id']=$_GET['id'];
 $i=0;
 $found=0;
 $count=count($_SESSION['breadcrumbs']);
@@ -50,15 +59,26 @@ if(! $found){
 	}
 }
 
-$i=0;
+$i=0;		
+
 echo '<ol class="breadcrumb">';
 $_SESSION['currentpath']='';
 $cb_path='';
 while($i<count($_SESSION['breadcrumbs'])){
 	$_SESSION['currentpath'].='/'.$_SESSION['breadcrumbs'][$i][5];
-	if($_SESSION['breadcrumbs'][$i][2]==$_SESSION['id'])
-		echo '<li class="active">'.$_SESSION['breadcrumbs'][$i][5].'</li>';
-	else
+	if($_SESSION['breadcrumbs'][$i][2]==$_SESSION['id']){
+		echo '<li class="active">'.$_SESSION['breadcrumbs'][$i][5];
+		$objekt=xml_call('ObjektHandler.getObjekt',
+				array(new xmlrpcval($_SESSION['breadcrumbs'][$i][2],'int'),
+						new xmlrpcval($_SESSION['breadcrumbs'][$i][4],'string')));
+		
+		if($objekt[21]) echo ' <a href="#" data-toggle="popover" title="'.htmlspecialchars($_SESSION['breadcrumbs'][$i][5]).'" data-content="'.htmlspecialchars($objekt[21]).'">
+		<span class="glyphicon glyphicon-info-sign"></span></a>
+		
+		
+		';
+		echo '</li>';
+	}else
 		echo '<li><a href="?id='.$_SESSION['breadcrumbs'][$i][2].'">'.$_SESSION['breadcrumbs'][$i][5].'</a></li>';
 	if($i>0) $cb_path.='/'.$_SESSION['breadcrumbs'][$i][5];
 	$i++;
@@ -83,4 +103,10 @@ new Clipboard(document.getElementById(\'cb-btn\'));
 echo '</ol>
 ';
 
+echo '<script>
+$(document).ready(function(){
+    $(\'[data-toggle="popover"]\').popover();   
+});
+</script>
+';
 ?>

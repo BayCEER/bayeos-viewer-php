@@ -194,6 +194,7 @@ if($_REQUEST['action']=='settings'){
 	if(is_array($_POST['cb_del'])){
 		for($i=0;$i<count($_POST['cb_del']);$i++){
 			unset($_SESSION['cb_saved'][$_POST['cb_del'][$i]]);
+			add_alert('Deleted clipboard '.$_POST['cb_del'][$i]);
 		}
 		$_GET['stab']='clipboards';
 	}
@@ -214,6 +215,7 @@ if($_REQUEST['action']=='settings'){
 	if(is_array($_POST['bm_del'])){
 		for($i=0;$i<count($_POST['bm_del']);$i++){
 			unset($_SESSION['bookmarks'][$_POST['bm_del'][$i]]);
+			add_alert('Deleted bookmark '.$_POST['bm_del'][$i]);
 		}
 		$_GET['stab']='bookmarks';
 	}
