@@ -21,11 +21,11 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 <script	src="/javascript/jquery-ui/jquery-ui.min.js"></script>
 <link rel="stylesheet"
 	href="/javascript/jquery-ui/css/smoothness/jquery-ui.min.css">
-<script src="js/jquery.datetimeentry.pack.js"></script>
+<script src="js/jquery.datetimepicker.full.min.js"></script>
 <!-- <script type="text/javascript"
 	src="/javascript/jquery-ui/jquery.mousewheel.js"></script>-->
 <style type="text/css">
-@import "js/jquery.datetimeentry.css";
+@import "js/jquery.datetimepicker.min.css";
 </style>
 <script src="js/clipboard.min.js"></script>
 

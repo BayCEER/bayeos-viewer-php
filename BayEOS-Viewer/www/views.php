@@ -76,12 +76,11 @@ function get_input($id,$art,$value='',$class='form-control',$options=array()){
 	';
 			break;
 		case 'dateTime.iso8601':
-			$jquery_datefm='Y-O-D';
+			$jquery_datefm='Y-m-d';
 			$out.="<input class=\"$class\" id=\"$id\" name=\"$id\"
 			value=\"".$value."\"$readonly>"
 			.'<script type="text/javascript">
-			$(\'#'.$id.'\').datetimeEntry({datetimeFormat: \''.$jquery_datefm.' H:M\',
-			spinnerImage: \'js/spinnerOrange.png\'});
+			$(\'#'.$id.'\').datetimepicker({format: \''.$jquery_datefm.' H:i\'});
 			</script>';
 			break;
 		case 'SelectID':

@@ -7,7 +7,7 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 1.0.22
+Version: 1.0.23
 Postinst: apache_reload
 Postrm: apache_reload
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
@@ -53,30 +53,11 @@ Files: bayeos-viewer-php /etc/apache2/conf.d/
  www/js/d3.min.js /usr/share/bayeos-viewer-php/
  www/js/rickshaw.min.css /usr/share/bayeos-viewer-php/
  www/js/bootstrap.min.js /usr/share/bayeos-viewer-php/
- www/js/spinnerOrangeBig.png /usr/share/bayeos-viewer-php/
- www/js/spinnerGreen.png /usr/share/bayeos-viewer-php/
- www/js/spinnerDefault.png /usr/share/bayeos-viewer-php/
- www/js/jquery.datetimeentry.pack.js /usr/share/bayeos-viewer-php/
- www/js/spinnerGem.png /usr/share/bayeos-viewer-php/
- www/js/spinnerText.png /usr/share/bayeos-viewer-php/
- www/js/spinnerDefaultBig.png /usr/share/bayeos-viewer-php/
- www/js/spinnerSquareBig.png /usr/share/bayeos-viewer-php/
- www/js/spinnerTextBig.png /usr/share/bayeos-viewer-php/
- www/js/jquery.timeentry.css /usr/share/bayeos-viewer-php/
- www/js/bootstrap.js /usr/share/bayeos-viewer-php/
- www/js/spinnerBlue.png /usr/share/bayeos-viewer-php/
- www/js/spinnerUpDownBig.png /usr/share/bayeos-viewer-php/
- www/js/spinnerBlueBig.png /usr/share/bayeos-viewer-php/
- www/js/spinnerOrange.png /usr/share/bayeos-viewer-php/
- www/js/jquery.datetimeentry.css /usr/share/bayeos-viewer-php/
  www/js/bundle-bundle_bootstrap_defer.js /usr/share/bayeos-viewer-php/
  www/js/bootstrap-switch.js /usr/share/bayeos-viewer-php/
- www/js/jquery.timeentry.pack.js /usr/share/bayeos-viewer-php/
- www/js/spinnerGemBig.png /usr/share/bayeos-viewer-php/
+ www/js/jquery.datetimepicker.full.min.js /usr/share/bayeos-viewer-php/
+ www/js/jquery.datetimepicker.min.css /usr/share/bayeos-viewer-php/
  www/js/jquery-1.js /usr/share/bayeos-viewer-php/
- www/js/spinnerSquare.png /usr/share/bayeos-viewer-php/
- www/js/spinnerUpDown.png /usr/share/bayeos-viewer-php/
- www/js/spinnerGreenBig.png /usr/share/bayeos-viewer-php/
  www/views.php /usr/share/bayeos-viewer-php/
  www/view_breadcrumbs.php /usr/share/bayeos-viewer-php/
  www/view_chart.php /usr/share/bayeos-viewer-php/
