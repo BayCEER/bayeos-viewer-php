@@ -269,7 +269,7 @@ function xml_call($method,$args){
 	$context = stream_context_create(array('http' => array(
 			'method' => "POST",
 			'header' => "Content-Type: text/xml charset=UTF-8".
-			(isset($_SESSION['bayeosauth'])?"\nAuthentication:".$_SESSION['bayeosauth']:''),
+			(isset($_SESSION['bayeosauth'])?"\r\nAuthentication:".$_SESSION['bayeosauth']:''),
 			'content' => $request->serialize()
 	)));
 	$file = file_get_contents($_SESSION['bayeosurl'],

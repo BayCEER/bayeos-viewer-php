@@ -1,0 +1,3 @@
+#!/bin/sh
+a2enconf bayeos-viewer-php.conf
+service apache2 reload
