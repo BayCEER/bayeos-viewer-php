@@ -65,6 +65,7 @@ slide: function( event, ui ) {
 <?php 
 echo_field("from",'From','dateTime.iso8601',date('Y-m-d H:i',$min_ts),3);
 echo_field("until",'Until','dateTime.iso8601',date('Y-m-d H:i',$max_ts),3);
+if(! isset($_POST['interval'])) $_POST['interval']='';
 echo_field("interval",'Interval','SelectValue',$_POST['interval'],
 			3,array('selectvalues'=>array('','today','yesterday','this week','last week','this month','last month','this year','last year')));
 echo '<div class="col-sm-3 col-lg-3"><br/>';

@@ -41,7 +41,7 @@
 		// no more need to dl-open it. It might have been compiled out on *nix...
 		if(strtoupper(substr(PHP_OS, 0, 3) != 'WIN'))
 		{
-			dl('xml.so');
+//			dl('xml.so');
 		}
 	}
 

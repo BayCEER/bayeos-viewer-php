@@ -15,10 +15,10 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 <link rel="stylesheet" href="<?php echo $config['customBootstrapHome'];?>css/bootstrap.min.css">
 <link rel="stylesheet" href="js/rickshaw.min.css">
 <link rel="stylesheet" href="css/main.css">
+<script src="js/jquery.min.js"></script>
+<script	src="/javascript/jquery-ui/jquery-ui.min.js"></script>
 <script src="js/jstz.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="/javascript/jquery/jquery.min.js"></script>
-<script	src="/javascript/jquery-ui/jquery-ui.min.js"></script>
 <link rel="stylesheet"
 	href="/javascript/jquery-ui/css/smoothness/jquery-ui.min.css">
 <script src="js/jquery.datetimepicker.full.min.js"></script>
@@ -48,7 +48,7 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 							class="icon-bar"></span>
 					</button>
 				<?php }
-				$HOMELINK="./?tab=Folders".(isset($_SESSION['homefolder'])?'&id='.$_SESSION['homefolder']:'');
+				$HOMELINK="./?tab=Folders".($_SESSION['homefolder']?'&id='.$_SESSION['homefolder']:'');
 				?>
 
 					<a href="<?php echo $HOMELINK;?>" class="navbar-brand"><strong>BayEOS</strong> Server</a>
@@ -71,7 +71,7 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 												'Locations'=>array('icon'=>'home'),
 												'Compartments'=>array('icon'=>'th-large')
 										)));
-						if($_SESSION['dbConnection']){
+						if(isset($_SESSION['dbConnection'])){
 							$nav['Admin']['dropdown']['sep2']=1;
 							$nav['Admin']['dropdown']['Authentication']=array('icon'=>'cog');
 							$nav['Admin']['dropdown']['User/Roles']=array('icon'=>'user');
@@ -79,7 +79,7 @@ if(! isset($config['customBootstrapHome'])) $config['customBootstrapHome']='';
 						if(count($_SESSION['bookmarks'])){
 							$nav['Bookmarks']['icon']='bookmark';
 							while(list($key,$value)=each($_SESSION['bookmarks'])){
-								$nav['Bookmarks']['dropdown'][$key]=array('url'=>'?tab=Folders&id='.$value);
+								$nav['Bookmarks']['dropdown'][$key]=array('url'=>'?tab=Folders&id='.$value,'icon'=>'');
 							}
 						}
 						

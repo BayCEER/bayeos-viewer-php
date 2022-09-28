@@ -1,3 +1,5 @@
 #!/bin/sh
 a2enconf bayeos-viewer-php.conf
+a2enconf javascript-common
 service apache2 reload
+exit 0

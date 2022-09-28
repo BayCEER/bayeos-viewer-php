@@ -42,6 +42,7 @@ if(isset($_POST['chart']))
 	$_SESSION['tab']='Chart';
 
 if(isset($_POST['renderer'])){
+    if(! isset($_POST['interpolate'])) $_POST['interpolate']=0;
 	$_SESSION['renderer']=$_POST['renderer'];
 	$_SESSION['interpolate']=$_POST['interpolate'];
 	if($_SESSION['renderer']!='line')

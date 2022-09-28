@@ -7,12 +7,12 @@ Priority: optional
 Standards-Version: 3.9.2
 
 Package: bayeos-viewer-php
-Version: 1.0.27.3+deb8.0
+Version: 1.0.27.3+deb9.0
 Postinst: postinst_jessie
 Postrm: postrm_jessie
 Maintainer: Stefan Holzheu <holzheu@bayceer.uni-bayreuth.de>
 # Pre-Depends: <comma-separated list of packages>
-Depends: gnuplot, phpexcel, libjs-jquery, libjs-jquery-ui, php5, libapache2-mod-php5, php5-xmlrpc, php5-pgsql, apache2
+Depends: gnuplot, phpexcel, libjs-jquery, libjs-jquery-ui, php, libapache2-mod-php, php-xmlrpc, php-pgsql, php-mbstring, apache2
 # Recommends: <comma-separated list of packages>
 # Suggests: <comma-separated list of packages>
 # Provides: <comma-separated list of packages>

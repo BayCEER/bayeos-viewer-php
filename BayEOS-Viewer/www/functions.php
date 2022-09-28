@@ -76,7 +76,7 @@ function set_post_from_until($interval){
 }
 
 function DBQueryParams($query,$params){
-	if(! $GLOBALS['conn'])
+	if(! isset($GLOBALS['conn']))
 		$GLOBALS['conn']=pg_connect($_SESSION['dbConnection']);
 	if(! $GLOBALS['conn']){
 		add_alert('Could not get database connection','danger');

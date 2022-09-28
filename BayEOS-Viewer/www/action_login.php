@@ -53,7 +53,8 @@ if($res===false) {
 	//Homefolder
 	if(isset($pref['homefolder']))	$_SESSION['homefolder']=$pref['homefolder'];
 	elseif(isset($_COOKIE['homefolder'])) $_SESSION['homefolder']=$_COOKIE['homefolder'];
-	if(isset($_SESSION['homefolder'])) $_GET['id']=$_SESSION['homefolder'];
+	else $_SESSION['homefolder']=0;
+	if($_SESSION['homefolder']) $_GET['id']=$_SESSION['homefolder'];
 	//Bookmarks
 	if(isset($pref['bookmarks'])) $_SESSION['bookmarks']=unserialize($pref['bookmarks']);
 	elseif(isset($_COOKIES['bookmarks'])) $_SESSION['bookmarks']=unserialize($_COOKIE['bookmarks']);

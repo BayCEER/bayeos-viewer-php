@@ -118,7 +118,7 @@ for($j=0;$j<count($data['datetime']);$j++){
 
 	echo "],
 	color: palette.color(),
-    name: '".$objekt[20].' <b>'.$series[$p][$i][5].'</b>'.($unit[$i]?" [$unit[$i]]":'')."'}";
+    name: '".$objekt[20].' '.($unit[$i]?" [$unit[$i]]":'')."'}";
 ?>
 ]
 });
@@ -189,6 +189,7 @@ if($no_data) echo '<div class="alert alert-danger">Selection returns no data. Pl
 
 echo_field("from",'From','dateTime.iso8601',date('Y-m-d H:i',$from),3);
 echo_field("until",'Until','dateTime.iso8601',date('Y-m-d H:i',$until),3);
+if(! isset($_POST['interval'])) $_POST['interval']='';
 echo_field("interval",'Interval','SelectValue',$_POST['interval'],
 			3,array('selectvalues'=>array('','today','last 24 hours','last 3 days','last 7 days','last 30 days','yesterday','this week','last week','this month','last month','this year','last year')));
 echo '<div class="col-sm-3 col-lg-3"><br/>';

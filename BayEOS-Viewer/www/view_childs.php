@@ -5,6 +5,10 @@ if(! isset($_GET['search'])) $_GET['search']='';
 if($_SESSION['current_tree']=='Folders') $art_filter='messung_%';
 else $art_filter=$GLOBALS['bayeos_tree_unames'][$_SESSION['current_tree']];
 
+//set defaults:
+if(! isset($_GET['stype'])) $_GET['stype']=0;
+
+
 ?>
 <form accept-charset="UTF-8">
 <?php 

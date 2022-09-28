@@ -149,6 +149,7 @@ if(! $_SESSION['agrfunc'] || ! $_SESSION['agrint'])	$filter_arg=xmlrpc_array($_S
 else $filter_arg=xmlrpc_array(array($_SESSION['agrfunc'],$_SESSION['agrint']),'int');
 
 $data=getSeries($ids, $_SESSION['agrfunc'], $_SESSION['agrint'], $timefilter, $filter_arg);
+$no_data=0;
 if(! isset($data['datetime'])) $no_data=1;
 
 for($p=0;$p<count($series);$p++){
